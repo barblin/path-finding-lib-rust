@@ -1,7 +1,4 @@
-use std::cmp::min;
-use std::collections::HashMap;
-
-use crate::graph::{Edge, Graph, Node};
+use crate::graph::{Edge, Graph};
 
 pub fn minimum_spanning(graph: Graph) -> Graph {
     return Graph { nodes: graph.nodes, edges: graph.edges };
