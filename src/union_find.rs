@@ -1,6 +1,6 @@
 use crate::graph::Node;
 
-struct UnionFind {
+pub(crate) struct UnionFind {
     sizes: Vec<usize>,
     ids: Vec<usize>,
     components: usize,

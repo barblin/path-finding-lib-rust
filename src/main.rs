@@ -9,5 +9,5 @@ fn main() {
     let graph = Graph::from(Vec::from([edge]));
     let mst = path::minimum_spanning(graph);
 
-    println!("{}", mst.edges.contains_key(&1));
+    println!("{}", mst.edges_lookup.contains_key(&1));
 }
