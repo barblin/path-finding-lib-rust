@@ -36,14 +36,12 @@ impl Graph {
     pub fn from(edges: Vec<Edge>) -> Graph {
         let mut edge_map = HashMap::new();
         let mut node_map: HashMap<usize, Vec<Edge>> = HashMap::new();
-        let mut graph_edges = Vec::new();
         let mut node_count: usize = 0;
 
-        for edge in edges {
+        for edge in &edges {
             edge_map.insert(edge.index.clone(), edge.clone());
             add_edge_to_node_map(edge.source.clone(), edge.clone(), &mut node_map);
             add_edge_to_node_map(edge.destination.clone(), edge.clone(), &mut node_map);
-            graph_edges.push(edge);
         }
 
         let mut nodes: HashMap<usize, Node> = HashMap::new();
@@ -52,7 +50,12 @@ impl Graph {
             node_count += 1;
         }
 
-        Graph { nodes_lookup: nodes, edges_lookup: edge_map, edges: graph_edges, node_count }
+        Graph {
+            nodes_lookup: nodes,
+            edges_lookup: edge_map,
+            edges,
+            node_count
+        }
     }
 
     pub fn sorted_by_weight_asc(&self) -> Vec<Edge> {
