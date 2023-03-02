@@ -1,7 +1,17 @@
 [package]
-name = "path-finding-lib-rust"
+name = "path-finding-lib"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+authors = ["barblin"]
+documentation = "https://github.com/barblin/path-finding-lib-rust/blob/master/README.md"
+readme = "README.md"
+repository = "https://github.com/barblin/path-finding-lib-rust"
+homepage = "https://github.com/barblin"
+description = "This library provides a variety of path finding and graph operations. Work in progress."
+keywords = ["game", "gamedev", "path", "pathfinding", "path finding",
+    "minimal spanning tree", "mst", "graph", "tree", "graphs", "trees", "union find"]
+categories = ["algorithms", "games", "game-development", "data-structures"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
