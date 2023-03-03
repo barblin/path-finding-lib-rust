@@ -52,6 +52,11 @@ pub fn your_function() {
 ### Depth-first search
 ```rust
 pub fn your_function() {
-    let dfs = path::find(4 /* source */, 1 /* target */, &graph, Box::from(DepthFirstSearch {} /* used algorithm */) as Box<dyn PathFinding>);
+    let dfs = path::find(
+        4 /* source */, 
+        1 /* target */, 
+        &graph, 
+        Box::from(DepthFirstSearch {} /* used algorithm */) as Box<dyn PathFinding>
+    );
 }
 ```
