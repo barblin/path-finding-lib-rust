@@ -1,5 +1,3 @@
-use crate::graph::Node;
-
 pub(crate) struct UnionFind {
     sizes: Vec<usize>,
     ids: Vec<usize>,
