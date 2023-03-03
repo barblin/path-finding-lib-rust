@@ -17,6 +17,13 @@ This library will contain standard path finding algorithms and return the result
 Download the crate: https://crates.io/search?q=path-finding-lib
 
 ## How to use
+At the moment, we have three major concepts:
+- Edge
+- Node
+- Graph
+
+You only need to pass edges to the graph. The nodes are generated automatically. Each pathfinding method will accept a graph,
+and return a graph that only contains the edges and nodes of the result.
 
 ### Create Graph
 
@@ -27,7 +34,7 @@ pub fn your_function() {
 }
 ```
 
-- Create graph
+- Create Graph
 
 ```rust
 pub fn your_function() {
@@ -45,7 +52,6 @@ pub fn your_function() {
 ### Depth-first search
 ```rust
 pub fn your_function() {
-    let dfs = path::find(4, 1, &graph, Box::from(DepthFirstSearch {}) as Box<dyn PathFinding>);
+    let dfs = path::find(4 /* source */, 1 /* target */, &graph, Box::from(DepthFirstSearch {} /* used algorithm */) as Box<dyn PathFinding>);
 }
 ```
-
