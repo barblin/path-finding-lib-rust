@@ -1,4 +1,5 @@
 # Path finding library
+<b>Beginner in Rust - Feedback highly appreciated!</b>
 
 This library will contain standard path finding algorithms and return the resulting path or graph object
 

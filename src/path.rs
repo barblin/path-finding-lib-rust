@@ -57,7 +57,7 @@ fn find_should_find_path_with_depth_first_search_in_undirected_graph() {
         total_cost += edge.normalized_weight;
     }
 
-    assert_eq!(0.2857142857, total_cost);
+    assert_eq!(1.4285715, total_cost);
 }
 
 #[test]

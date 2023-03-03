@@ -25,7 +25,7 @@ fn probe(start: Node, target: usize, graph: &Graph) -> Graph {
     let mut visited: Vec<usize> = Vec::new();
 
     while !stack.is_empty() {
-        let current = stack.pop_front().unwrap();
+        let current = stack.pop_back().unwrap();
         let edges = current.edges.clone();
         visited.push(current.node.id);
 
