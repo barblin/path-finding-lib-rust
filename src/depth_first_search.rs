@@ -2,6 +2,7 @@ use std::collections::LinkedList;
 
 use crate::graph::{Graph, Node};
 use crate::path::{PathFinding, Waypoint};
+use crate::path_util;
 
 pub struct DepthFirstSearch {}
 
@@ -41,29 +42,10 @@ fn probe(start: Node, target: usize, graph: &Graph) -> Graph {
             }
 
             if destination == target {
-                return walk_back(stack.pop_back().unwrap());
+                return path_util::walk_back(stack.pop_back().unwrap());
             }
         }
     }
 
     return Graph::from(Vec::new());
-}
-
-fn walk_back(waypoint: Waypoint) -> Graph {
-    let mut edges = Vec::new();
-    let mut path = Some(Box::new(waypoint));
-
-    while path.is_some() {
-        let current = path.clone().unwrap();
-        let leg = current.leg;
-        let previous = current.previous;
-        path = previous.clone();
-        if leg.is_some() {
-            edges.push(leg.unwrap());
-        } else {
-            Graph::from(Vec::new());
-        }
-    }
-
-    return Graph::from(edges);
 }

@@ -2,7 +2,7 @@ use crate::depth_first_search::DepthFirstSearch;
 use crate::graph::{Edge, Graph, Node};
 
 #[derive(Clone)]
-pub struct Waypoint {
+pub(crate) struct Waypoint {
     pub leg: Option<Edge>,
     pub edges: Vec<Edge>,
     pub previous: Option<Box<Waypoint>>,
