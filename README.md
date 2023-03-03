@@ -56,7 +56,7 @@ pub fn your_function() {
         4 /* source */, 
         1 /* target */, 
         &graph, 
-        Box::from(DepthFirstSearch {} /* used algorithm */) as Box<dyn PathFinding>
+        Box::from(DepthFirstSearch {}) as Box<dyn PathFinding> /* used algorithm */
     );
 }
 ```
