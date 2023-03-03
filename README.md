@@ -29,9 +29,15 @@ and return a graph that only contains the edges and nodes of the result.
 ### Create Graph
 
 - Create Edge
+
 ```rust
 pub fn your_function() {
-    graph::Edge::from();
+    graph::Edge::from(
+        0 /* edge index */,
+        0 /* source node */,
+        1 /* destination node */,
+        0.1, /* weight */
+    );
 }
 ```
 
