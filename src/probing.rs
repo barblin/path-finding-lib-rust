@@ -1,6 +1,6 @@
-use std::collections::LinkedList;
-use crate::graph::{Graph, Node};
+use std::collections::{HashMap, LinkedList};
 
+use crate::graph::{Edge, Graph, Node};
 use crate::path::Waypoint;
 use crate::path_util;
 
@@ -19,7 +19,7 @@ pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Cal
         None, start.edges.clone(), start, None)]);
     let mut visited: Vec<usize> = Vec::new();
 
-    while !stack.is_empty() {
+    while !deque.is_empty() {
         let current = (control_flow)(deque);
         let edges = current.edges.clone();
         visited.push(current.node.id);
@@ -41,10 +41,83 @@ pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Cal
             }
 
             if destination == target {
-                return path_util::walk_back(deque.pop_back().unwrap());
+                return Graph::from(path_util::walk_back(deque.pop_back().unwrap()));
             }
         }
     }
 
     return Graph::from(Vec::new());
+}
+
+pub(crate) fn bi_directional_probe(start: Node, target: Node, graph: &Graph) -> Graph {
+    let start_queue = &mut LinkedList::from([Waypoint::from(
+        None, start.edges.clone(), start.clone(), None)]);
+    let target_queue = &mut LinkedList::from([Waypoint::from(
+        None, target.edges.clone(), target.clone(), None)]);
+
+    let mut start_visited: HashMap<usize, Waypoint> = HashMap::new();
+    let mut target_visited: HashMap<usize, Waypoint> = HashMap::new();
+
+    while !start_queue.is_empty() || !target_queue.is_empty() {
+        let mut current_start = queue(start_queue);
+        let current_target = queue(target_queue);
+
+        let result_start = process_edges(start_queue, &current_start, &target.id,
+                                         graph, &start_visited, &target_visited);
+        start_visited.insert(current_start.node.id.clone(), current_start.clone());
+
+        if result_start.is_some() {
+            return Graph::from(result_start.unwrap());
+        }
+
+        let result_target = process_edges(target_queue, &current_target, &start.id,
+                                          graph, &target_visited, &start_visited);
+
+        target_visited.insert(current_target.node.id.clone(), current_target.clone());
+
+        if result_target.is_some() {
+            return Graph::from(result_target.unwrap());
+        }
+
+    }
+
+    return Graph::from(Vec::new());
+}
+
+fn process_edges(
+    queue: &mut LinkedList<Waypoint>,
+    current: &Waypoint,
+    target: &usize,
+    graph: &Graph,
+    visited: &HashMap<usize, Waypoint>,
+    other_visited: &HashMap<usize, Waypoint>) -> Option<Vec<Edge>>
+{
+    let edges = current.edges.clone();
+
+    for edge in edges {
+        let destination = edge.destination;
+
+        let waypoint = Waypoint::from(
+            Some(edge), graph.nodes_lookup.get(&destination).unwrap().edges.clone(),
+            graph.nodes_lookup.get(&destination).unwrap().clone(),
+            Some(Box::new(current.clone())),
+        );
+
+        if destination == *target {
+            return Some(path_util::walk_back(waypoint));
+        }
+
+        if !visited.contains_key(&destination) {
+            queue.push_back(waypoint)
+        }
+
+        if other_visited.contains_key(&destination) {
+            let mut from_current = path_util::walk_back(current.clone());
+            let mut from_destination = path_util::walk_back(other_visited.get(&destination).unwrap().clone());
+            from_current.append(&mut from_destination.clone());
+            return Some(from_current);
+        }
+    }
+
+    return None;
 }
