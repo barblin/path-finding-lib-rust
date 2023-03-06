@@ -4,11 +4,14 @@
 This library will contain standard path finding algorithms and return the resulting path or graph object
 
 - [How to use](#how-to-use)
-    * [Create Graph](#create-graph)
-    * [Minimum spanning tree](#minimum-spanning-tree)
-    * [Depth-first search](#depth-first-search)
+  * [Create Graph](#create-graph)
+  * [Minimum spanning tree](#minimum-spanning-tree)
+  * [Depth-first search](#depth-first-search)
+  * [Breadth-first search](#breadth-first-search)
+  * [Bidirectional breadth-first search](#bidirectional-breadth-first-search)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 <b>Currently supported</b>:
 - construct graphs
