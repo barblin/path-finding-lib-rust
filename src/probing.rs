@@ -15,12 +15,12 @@ pub(crate) fn queue(queue: &mut LinkedList<Waypoint>) -> Waypoint {
 }
 
 pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Callback) -> Graph {
-    let stack = &mut LinkedList::from([Waypoint::from(
+    let deque = &mut LinkedList::from([Waypoint::from(
         None, start.edges.clone(), start, None)]);
     let mut visited: Vec<usize> = Vec::new();
 
     while !stack.is_empty() {
-        let current = (control_flow)(stack);
+        let current = (control_flow)(deque);
         let edges = current.edges.clone();
         visited.push(current.node.id);
 
@@ -37,11 +37,11 @@ pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Cal
             );
 
             if graph.nodes_lookup.get(&destination).is_some() && !visited.contains(&destination) {
-                stack.push_back(waypoint)
+                deque.push_back(waypoint)
             }
 
             if destination == target {
-                return path_util::walk_back(stack.pop_back().unwrap());
+                return path_util::walk_back(deque.pop_back().unwrap());
             }
         }
     }
