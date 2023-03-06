@@ -41,7 +41,7 @@ pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Cal
             }
 
             if destination == target {
-                return Graph::from(path_util::walk_back(deque.pop_back().unwrap()));
+                return Graph::from(path_util::walk_back(deque.pop_back().unwrap()).into_iter().collect());
             }
         }
     }
@@ -59,26 +59,25 @@ pub(crate) fn bi_directional_probe(start: Node, target: Node, graph: &Graph) -> 
     let mut target_visited: HashMap<usize, Waypoint> = HashMap::new();
 
     while !start_queue.is_empty() || !target_queue.is_empty() {
-        let mut current_start = queue(start_queue);
-        let current_target = queue(target_queue);
+        let current_start = queue(start_queue);
 
         let result_start = process_edges(start_queue, &current_start, &target.id,
                                          graph, &start_visited, &target_visited);
-        start_visited.insert(current_start.node.id.clone(), current_start.clone());
+        start_visited.insert(current_start.node.id, current_start.clone());
 
         if result_start.is_some() {
             return Graph::from(result_start.unwrap());
         }
 
+        let current_target = queue(target_queue);
         let result_target = process_edges(target_queue, &current_target, &start.id,
                                           graph, &target_visited, &start_visited);
 
-        target_visited.insert(current_target.node.id.clone(), current_target.clone());
+        target_visited.insert(current_target.node.id, current_target.clone());
 
         if result_target.is_some() {
             return Graph::from(result_target.unwrap());
         }
-
     }
 
     return Graph::from(Vec::new());
@@ -104,7 +103,7 @@ fn process_edges(
         );
 
         if destination == *target {
-            return Some(path_util::walk_back(waypoint));
+            return Some(path_util::walk_back(waypoint).into_iter().collect());
         }
 
         if !visited.contains_key(&destination) {
@@ -112,10 +111,10 @@ fn process_edges(
         }
 
         if other_visited.contains_key(&destination) {
-            let mut from_current = path_util::walk_back(current.clone());
-            let mut from_destination = path_util::walk_back(other_visited.get(&destination).unwrap().clone());
-            from_current.append(&mut from_destination.clone());
-            return Some(from_current);
+            let mut from_current = path_util::walk_back(queue.pop_back().unwrap());
+            let from_destination = path_util::walk_back(other_visited.get(&destination).unwrap().clone());
+            from_current.extend(from_destination);
+            return Some(from_current.into_iter().collect());
         }
     }
 

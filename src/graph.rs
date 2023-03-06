@@ -1,11 +1,15 @@
 use std::collections::HashMap;
+use derivative::Derivative;
 use crate::union_find::UnionFind;
 
-#[derive(Clone)]
+#[derive(Derivative)]
+#[derivative(Clone, PartialEq, Eq, Hash)]
 pub struct Edge {
     index: usize,
     pub source: usize,
     pub destination: usize,
+    #[derivative(PartialEq="ignore")]
+    #[derivative(Hash="ignore")]
     pub normalized_weight: f32,
 }
 

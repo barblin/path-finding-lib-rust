@@ -65,11 +65,11 @@ fn should_find_path_with_depth_first_search_in_directed_graph() {
 #[test]
 fn should_find_path_with_breadth_first_search_in_undirected_graph() {
     let graph = undirected_graph();
-    let dfs = find(0, 2, &graph,
+    let bfs = find(0, 2, &graph,
                    Box::from(crate::breadth_first::BreadthFirstSearch {}) as Box<dyn PathFinding>);
 
     let mut total_cost: f32 = 0.0;
-    for edge in dfs.edges {
+    for edge in bfs.edges {
         total_cost += edge.normalized_weight;
     }
 
@@ -78,11 +78,11 @@ fn should_find_path_with_breadth_first_search_in_undirected_graph() {
 
 #[test]
 fn should_find_path_with_breadth_first_search_in_directed_graph() {
-    let dfs = find(4, 1, &directed_graph(),
+    let bfs = find(4, 1, &directed_graph(),
                    Box::from(crate::breadth_first::BreadthFirstSearch {}) as Box<dyn PathFinding>);
 
     let mut total_cost: f32 = 0.0;
-    for edge in dfs.edges {
+    for edge in bfs.edges {
         total_cost += edge.normalized_weight;
     }
 
@@ -92,11 +92,11 @@ fn should_find_path_with_breadth_first_search_in_directed_graph() {
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_undirected_graph() {
     let graph = undirected_graph();
-    let dfs = find(0, 2, &graph,
+    let bfs = find(0, 2, &graph,
                    Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
 
     let mut total_cost: f32 = 0.0;
-    for edge in dfs.edges {
+    for edge in bfs.edges {
         total_cost += edge.normalized_weight;
     }
 
@@ -105,11 +105,11 @@ fn should_find_path_with_bi_breadth_first_search_in_undirected_graph() {
 
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
-    let dfs = find(4, 1, &directed_graph(),
+    let bfs = find(4, 1, &directed_graph(),
                    Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
 
     let mut total_cost: f32 = 0.0;
-    for edge in dfs.edges {
+    for edge in bfs.edges {
         total_cost += edge.normalized_weight;
     }
 
@@ -119,11 +119,11 @@ fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
 
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection() {
-    let dfs = find(0, 13, &graphs_with_one_connection(),
+    let bfs = find(0, 13, &graphs_with_one_connection(),
                    Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
 
     let mut total_cost: f32 = 0.0;
-    for edge in dfs.edges {
+    for edge in bfs.edges {
         total_cost += edge.normalized_weight;
     }
 
