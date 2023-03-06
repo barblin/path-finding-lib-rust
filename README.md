@@ -15,6 +15,7 @@ This library will contain standard path finding algorithms and return the result
 - create minimum spanning tree from graph
 - find path with depth-first search
 - find path with breadth-first search
+- find path with bidirectional breadth-first search
 
 Download the crate: https://crates.io/search?q=path-finding-lib
 
@@ -77,6 +78,18 @@ pub fn your_function() {
         1 /* target */, 
         &graph, 
         Box::from(BreadthFirstSearch {}) as Box<dyn PathFinding> /* used algorithm */
+    );
+}
+```
+
+### Bidirectional breadth-first search
+```rust
+pub fn your_function() {
+    let dfs = path::find(
+        4 /* source */, 
+        1 /* target */, 
+        &graph, 
+        Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding> /* used algorithm */
     );
 }
 ```
