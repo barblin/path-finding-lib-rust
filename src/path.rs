@@ -1,18 +1,17 @@
+use std::collections::HashSet;
 use crate::graph::{Edge, Graph, Node};
 
 #[derive(Clone)]
 pub(crate) struct Waypoint {
     pub leg: Option<Edge>,
-    pub edges: Vec<Edge>,
     pub previous: Option<Box<Waypoint>>,
     pub node: Node,
 }
 
 impl Waypoint {
-    pub fn from(edge: Option<Edge>, edges: Vec<Edge>, node: Node, previous: Option<Box<Waypoint>>) -> Waypoint {
+    pub fn from(edge: Option<Edge>, node: Node, previous: Option<Box<Waypoint>>) -> Waypoint {
         return Waypoint {
             leg: edge,
-            edges,
             previous,
             node,
         };
@@ -34,6 +33,61 @@ pub fn find(source: usize, target: usize, graph: &Graph, path_finding: Box<dyn P
     return path_finding.execute(source_node.unwrap().clone(), target_node.unwrap().clone(), graph);
 }
 
+pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
+    let mut edges = HashSet::new();
+    let mut path = Some(Box::new(waypoint));
+
+    while path.is_some() {
+        let current = path.unwrap();
+        let leg = current.leg;
+        let previous = current.previous;
+        path = previous.clone();
+        if leg.is_some() {
+            edges.insert(leg.unwrap());
+        }
+    }
+
+    return edges;
+}
+
+#[test]
+fn walk_back_with_only_one_waypoint_should_succeed() {
+    let waypoint = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), Node {
+        id: 1,
+        edges: Vec::new(),
+    }, None);
+
+    let mut sum_weight = 0.0;
+    for edge in walk_back(waypoint) {
+        sum_weight += edge.normalized_weight;
+    }
+
+    assert_eq!(1.0, sum_weight)
+}
+
+#[test]
+fn walk_back_without_leg_should_succeed() {
+    let waypoint = Waypoint::from(None, Node {
+        id: 1,
+        edges: Vec::new(),
+    }, None);
+
+    let edges = walk_back(waypoint);
+    assert_eq!(0, edges.len());
+}
+
+
+#[test]
+fn walk_back_with_path_should_succeed() {
+    let edges = walk_back(stubbed_path());
+    let mut sum_weight = 0.0;
+    for edge in &edges {
+        sum_weight += edge.normalized_weight;
+    }
+
+    assert_eq!(10.0, sum_weight);
+    assert_eq!(10, edges.len());
+}
 
 #[test]
 fn should_find_path_with_depth_first_search_in_undirected_graph() {
@@ -116,7 +170,6 @@ fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
     assert_eq!(37.0, total_cost);
 }
 
-
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection() {
     let bfs = find(0, 13, &graphs_with_one_connection(),
@@ -162,7 +215,6 @@ fn directed_graph() -> Graph {
     return Graph::from(Vec::from([edge1, edge2, edge3, edge4, edge5, edge6]));
 }
 
-
 fn graphs_with_one_connection() -> Graph {
     let edge1 = Edge::from(0, 0, 4, 1.0);
     let edge2 = Edge::from(1, 1, 4, 2.0);
@@ -182,4 +234,22 @@ fn graphs_with_one_connection() -> Graph {
 
     return Graph::from(Vec::from([edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8,
         edge9, edge10, edge11, edge12, edge13, edge14]));
+}
+
+fn stubbed_path() -> Waypoint {
+    let start_point = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), Node {
+        id: 0,
+        edges: Vec::new(),
+    }, None);
+
+    let mut current = start_point;
+    for i in 0..10 {
+        let edge_stub = Some(Edge::from(i, 0, 1, 1.0));
+        current = Waypoint::from(edge_stub.clone(), Node {
+            id: 0,
+            edges: Vec::new(),
+        }, Some(Box::from(current.clone())))
+    }
+
+    return current.clone();
 }
