@@ -25,16 +25,14 @@ pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Cal
 
         for edge in edges {
             let destination = edge.destination;
-            let destination_node = graph.nodes_lookup.get(&destination).unwrap();
-            let previous = current.clone();
 
             let waypoint = Waypoint::from(
                 Some(edge.clone()),
-                destination_node.clone(),
-                Some(Box::new(previous)),
+                graph.nodes_lookup.get(&destination).unwrap().clone(),
+                Some(Box::new(current.clone())),
             );
 
-            if graph.nodes_lookup.get(&destination).is_some() && !visited.contains(&destination) {
+            if !visited.contains(&destination) {
                 deque.push_back(waypoint)
             }
 
@@ -59,7 +57,7 @@ pub(crate) fn bi_directional_probe(start: Node, target: Node, graph: &Graph) -> 
     while !start_queue.is_empty() || !target_queue.is_empty() {
         let current_start = queue(start_queue);
 
-        let result_start = process_edges(start_queue, &current_start, &target.id,
+        let result_start = process_edges(start_queue, &current_start, target.id,
                                          graph, &start_visited, &target_visited);
         start_visited.insert(current_start.node.id, current_start.clone());
 
@@ -68,7 +66,7 @@ pub(crate) fn bi_directional_probe(start: Node, target: Node, graph: &Graph) -> 
         }
 
         let current_target = queue(target_queue);
-        let result_target = process_edges(target_queue, &current_target, &start.id,
+        let result_target = process_edges(target_queue, &current_target, start.id,
                                           graph, &target_visited, &start_visited);
 
         target_visited.insert(current_target.node.id, current_target.clone());
@@ -84,7 +82,7 @@ pub(crate) fn bi_directional_probe(start: Node, target: Node, graph: &Graph) -> 
 fn process_edges(
     queue: &mut LinkedList<Waypoint>,
     current: &Waypoint,
-    target: &usize,
+    target: usize,
     graph: &Graph,
     visited: &HashMap<usize, Waypoint>,
     other_visited: &HashMap<usize, Waypoint>) -> Option<Vec<Edge>>
@@ -99,7 +97,7 @@ fn process_edges(
             Some(Box::new(current.clone())),
         );
 
-        if destination == *target {
+        if destination == target {
             return Some(path::walk_back(waypoint).into_iter().collect());
         }
 
