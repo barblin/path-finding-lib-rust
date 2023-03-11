@@ -1,5 +1,8 @@
 use std::collections::HashMap;
+use std::vec;
+
 use derivative::Derivative;
+
 use crate::union_find::UnionFind;
 
 #[derive(Derivative)]
@@ -8,18 +11,18 @@ pub struct Edge {
     index: usize,
     pub source: usize,
     pub destination: usize,
-    #[derivative(PartialEq="ignore")]
-    #[derivative(Hash="ignore")]
-    pub normalized_weight: f32,
+    #[derivative(PartialEq = "ignore")]
+    #[derivative(Hash = "ignore")]
+    pub weight: f32,
 }
 
 impl Edge {
-    pub fn from(index: usize, source: usize, destination: usize, normalized_weight: f32) -> Edge {
+    pub fn from(index: usize, source: usize, destination: usize, weight: f32) -> Edge {
         return Edge {
             index,
             source,
             destination,
-            normalized_weight,
+            weight,
         };
     }
 }
@@ -45,8 +48,7 @@ impl Graph {
 
         for edge in &edges {
             edge_map.insert(edge.index.clone(), edge.clone());
-            add_edge_to_node_map(edge.source.clone(), edge.clone(), &mut node_map);
-            add_edge_to_node_map(edge.destination.clone(), edge.clone(), &mut node_map);
+            add_edge_to_node_map(edge.source.clone(), edge.destination.clone(), edge.clone(), &mut node_map);
         }
 
         let mut nodes: HashMap<usize, Node> = HashMap::new();
@@ -63,18 +65,34 @@ impl Graph {
         }
     }
 
+    pub fn from_adjacency_matrix(matrix: &[&[f32]]) -> Graph {
+        let mut index: usize = 0;
+        let mut vec: Vec<Edge> = Vec::new();
+        for (row, array) in matrix.iter().enumerate() {
+            for (col, weight) in array.iter().enumerate() {
+                if !weight.eq(&(0.0 as f32)) {
+                    vec.push(Edge::from(index, row, col, weight.clone()));
+                    index += 1;
+                }
+            }
+        }
+
+        return Graph::from(vec);
+    }
+
     pub fn sorted_by_weight_asc(&self) -> Vec<Edge> {
         let mut sorted_edges = self.edges.clone();
         sorted_edges.sort_by(|edge1, edge2|
-            edge1.normalized_weight.total_cmp(&edge2.normalized_weight));
+            edge1.weight.total_cmp(&edge2.weight));
         return sorted_edges;
     }
 }
 
-fn add_edge_to_node_map(id: usize, edge: Edge, node_map: &mut HashMap<usize, Vec<Edge>>) {
-    let mut vec = node_map.get(&id).or(Some(&Vec::<Edge>::new())).unwrap().to_vec();
+fn add_edge_to_node_map(src: usize, dest: usize, edge: Edge, node_map: &mut HashMap<usize, Vec<Edge>>) {
+    let mut vec = node_map.get(&src).or(Some(&Vec::<Edge>::new())).unwrap().to_vec();
     vec.push(edge);
-    node_map.insert(id.clone(), vec);
+    node_map.insert(src.clone(), vec);
+    node_map.entry(dest).or_insert_with(|| Vec::new());
 }
 
 pub fn minimum_spanning(graph: Graph) -> Graph {
@@ -131,7 +149,7 @@ fn mst_should_return_minimum_spanning_tree() {
 
     let mut total_cost: f32 = 0.0;
     for edge in min_graph.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(0.7142857143, total_cost);
@@ -144,7 +162,7 @@ fn edge_from_should_construct_edge() {
     assert_eq!(0, edge.index);
     assert_eq!(2, edge.source);
     assert_eq!(3, edge.destination);
-    assert_eq!(0.5, edge.normalized_weight);
+    assert_eq!(0.5, edge.weight);
 }
 
 #[test]
@@ -157,8 +175,30 @@ fn sorted_by_weight_asc_should_return_sorted_vec() {
     let graph = Graph::from(Vec::from([edge1, edge2, edge3, edge4]));
     let sorted_edges = graph.sorted_by_weight_asc();
 
-    assert_eq!(0.2, sorted_edges[0].normalized_weight);
-    assert_eq!(0.3, sorted_edges[1].normalized_weight);
-    assert_eq!(0.5, sorted_edges[2].normalized_weight);
-    assert_eq!(0.7, sorted_edges[3].normalized_weight);
+    assert_eq!(0.2, sorted_edges[0].weight);
+    assert_eq!(0.3, sorted_edges[1].weight);
+    assert_eq!(0.5, sorted_edges[2].weight);
+    assert_eq!(0.7, sorted_edges[3].weight);
+}
+
+#[test]
+fn create_graph_from_adjacency_matrix() {
+    let mut matrix: &[&[f32]] = &[
+        &[0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.0, 0.0],
+        &[4.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0],
+        &[0.0, 8.0, 0.0, 7.0, 0.0, 4.0, 0.0, 0.0, 2.0],
+        &[0.0, 0.0, 7.0, 0.0, 9.0, 14.0, 0.0, 0.0, 0.0],
+        &[0.0, 0.0, 0.0, 9.0, 0.0, 10.0, 0.0, 0.0, 0.0],
+        &[0.0, 0.0, 4.0, 14.0, 10.0, 0.0, 2.0, 0.0, 0.0],
+        &[0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 1.0, 6.0],
+        &[8.0, 11.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 7.0],
+        &[0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 6.0, 7.0, 0.0]
+    ];
+
+    let graph = Graph::from_adjacency_matrix(matrix);
+
+    assert_eq!(28, graph.edges.len());
+    assert_eq!(2, graph.nodes_lookup.get(&0).unwrap().edges.len());
+    assert_eq!(3, graph.nodes_lookup.get(&8).unwrap().edges.len());
+    assert_eq!(2.0, graph.nodes_lookup.get(&8).unwrap().edges[0].weight);
 }
