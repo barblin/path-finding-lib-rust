@@ -60,7 +60,7 @@ fn walk_back_with_only_one_waypoint_should_succeed() {
 
     let mut sum_weight = 0.0;
     for edge in walk_back(waypoint) {
-        sum_weight += edge.normalized_weight;
+        sum_weight += edge.weight;
     }
 
     assert_eq!(1.0, sum_weight)
@@ -83,7 +83,7 @@ fn walk_back_with_path_should_succeed() {
     let edges = walk_back(stubbed_path());
     let mut sum_weight = 0.0;
     for edge in &edges {
-        sum_weight += edge.normalized_weight;
+        sum_weight += edge.weight;
     }
 
     assert_eq!(10.0, sum_weight);
@@ -98,7 +98,7 @@ fn should_find_path_with_depth_first_search_in_undirected_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in dfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(1.4285715, total_cost);
@@ -111,7 +111,7 @@ fn should_find_path_with_depth_first_search_in_directed_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in dfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(39.0, total_cost);
@@ -125,7 +125,7 @@ fn should_find_path_with_breadth_first_search_in_undirected_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(0.2857143, total_cost);
@@ -138,7 +138,7 @@ fn should_find_path_with_breadth_first_search_in_directed_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(39.0, total_cost);
@@ -152,7 +152,7 @@ fn should_find_path_with_bi_breadth_first_search_in_undirected_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(0.2857143, total_cost);
@@ -165,10 +165,90 @@ fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(39.0, total_cost);
+}
+
+#[test]
+fn should_find_path_with_one_edge() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(0, 1, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(1.0, total_cost);
+    assert_eq!(1, bfs.edges.len());
+}
+
+#[test]
+fn should_not_find_path_with_same_target_and_source() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(1, 1, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(0.0, total_cost);
+    assert_eq!(0, bfs.edges.len());
+}
+
+#[test]
+fn should_not_find_path_with_unknown_target() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(0, 2, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(0.0, total_cost);
+    assert_eq!(0, bfs.edges.len());
+}
+
+#[test]
+fn should_not_find_path_with_unknown_source() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(2, 0, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(0.0, total_cost);
+    assert_eq!(0, bfs.edges.len());
+}
+
+#[test]
+fn should_find_path_with_source_and_target_reversed() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(1, 0, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(1.0, total_cost);
+    assert_eq!(1, bfs.edges.len());
 }
 
 #[test]
@@ -178,7 +258,7 @@ fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection()
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(50.0, total_cost);
