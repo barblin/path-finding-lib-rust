@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+
 use crate::graph::{Edge, Graph, Node};
 
 #[derive(Clone)]
@@ -59,7 +60,7 @@ fn walk_back_with_only_one_waypoint_should_succeed() {
 
     let mut sum_weight = 0.0;
     for edge in walk_back(waypoint) {
-        sum_weight += edge.normalized_weight;
+        sum_weight += edge.weight;
     }
 
     assert_eq!(1.0, sum_weight)
@@ -82,7 +83,7 @@ fn walk_back_with_path_should_succeed() {
     let edges = walk_back(stubbed_path());
     let mut sum_weight = 0.0;
     for edge in &edges {
-        sum_weight += edge.normalized_weight;
+        sum_weight += edge.weight;
     }
 
     assert_eq!(10.0, sum_weight);
@@ -97,7 +98,7 @@ fn should_find_path_with_depth_first_search_in_undirected_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in dfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(1.4285715, total_cost);
@@ -110,7 +111,7 @@ fn should_find_path_with_depth_first_search_in_directed_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in dfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(39.0, total_cost);
@@ -124,7 +125,7 @@ fn should_find_path_with_breadth_first_search_in_undirected_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(0.2857143, total_cost);
@@ -137,7 +138,7 @@ fn should_find_path_with_breadth_first_search_in_directed_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(39.0, total_cost);
@@ -151,7 +152,7 @@ fn should_find_path_with_bi_breadth_first_search_in_undirected_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(0.2857143, total_cost);
@@ -164,10 +165,90 @@ fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
-    assert_eq!(37.0, total_cost);
+    assert_eq!(39.0, total_cost);
+}
+
+#[test]
+fn should_find_path_with_one_edge() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(0, 1, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(1.0, total_cost);
+    assert_eq!(1, bfs.edges.len());
+}
+
+#[test]
+fn should_not_find_path_with_same_target_and_source() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(1, 1, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(0.0, total_cost);
+    assert_eq!(0, bfs.edges.len());
+}
+
+#[test]
+fn should_not_find_path_with_unknown_target() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(0, 2, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(0.0, total_cost);
+    assert_eq!(0, bfs.edges.len());
+}
+
+#[test]
+fn should_not_find_path_with_unknown_source() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(2, 0, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(0.0, total_cost);
+    assert_eq!(0, bfs.edges.len());
+}
+
+#[test]
+fn should_find_path_with_source_and_target_reversed() {
+    let mut edges = Vec::new();
+    edges.push(Edge::from(0, 0, 1, 1.0));
+    let bfs = find(1, 0, &Graph::from(edges),
+                   Box::from(crate::breadth_first::BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(1.0, total_cost);
+    assert_eq!(1, bfs.edges.len());
 }
 
 #[test]
@@ -177,7 +258,7 @@ fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection()
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
-        total_cost += edge.normalized_weight;
+        total_cost += edge.weight;
     }
 
     assert_eq!(50.0, total_cost);
@@ -232,8 +313,25 @@ fn graphs_with_one_connection() -> Graph {
     let edge13 = Edge::from(12, 10, 8, 13.0);
     let edge14 = Edge::from(13, 8, 7, 14.0);
 
+    let edge15 = Edge::from(14, 4, 0, 1.0);
+    let edge16 = Edge::from(15, 4, 1, 2.0);
+    let edge17 = Edge::from(16, 6, 4, 3.0);
+    let edge18 = Edge::from(17, 5, 3, 4.0);
+    let edge19 = Edge::from(18, 5, 2, 5.0);
+    let edge20 = Edge::from(19, 6, 5, 6.0);
+    let edge21 = Edge::from(20, 7, 6, 7.0);
+
+    let edge22 = Edge::from(21, 9, 11, 8.0);
+    let edge23 = Edge::from(22, 9, 12, 9.0);
+    let edge24 = Edge::from(23, 8, 9, 10.0);
+    let edge25 = Edge::from(24, 10, 14, 11.0);
+    let edge26 = Edge::from(25, 10, 13, 12.0);
+    let edge27 = Edge::from(26, 8, 10, 13.0);
+    let edge28 = Edge::from(27, 7, 8, 14.0);
+
     return Graph::from(Vec::from([edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8,
-        edge9, edge10, edge11, edge12, edge13, edge14]));
+        edge9, edge10, edge11, edge12, edge13, edge14, edge15, edge16, edge17, edge18, edge19, edge20,
+        edge21, edge22, edge23, edge24, edge25, edge26, edge27, edge28]));
 }
 
 fn stubbed_path() -> Waypoint {
