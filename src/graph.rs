@@ -182,7 +182,7 @@ fn sorted_by_weight_asc_should_return_sorted_vec() {
 
 #[test]
 fn create_graph_from_adjacency_matrix() {
-    let mut matrix: &[&[f32]] = &[
+    let matrix: &[&[f32]] = &[
         &[0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.0, 0.0],
         &[4.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 11.0, 0.0],
         &[0.0, 8.0, 0.0, 7.0, 0.0, 4.0, 0.0, 0.0, 2.0],

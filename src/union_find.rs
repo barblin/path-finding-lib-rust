@@ -1,4 +1,4 @@
-pub(crate) struct UnionFind {
+pub struct UnionFind {
     sizes: Vec<usize>,
     ids: Vec<usize>,
     components: usize,

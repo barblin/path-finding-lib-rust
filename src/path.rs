@@ -264,6 +264,20 @@ fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection()
     assert_eq!(50.0, total_cost);
 }
 
+#[test]
+fn should_find_path_with_dijkstra_in_graphs_with_one_connection() {
+    let bfs = find(0, 13, &graphs_with_one_connection(),
+                   Box::from(crate::dijkstra::Dijkstra {}) as Box<dyn PathFinding>);
+
+    let mut total_cost: f32 = 0.0;
+    for edge in bfs.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(50.0, total_cost);
+}
+
+#[cfg(test)]
 fn undirected_graph() -> Graph {
     let edge1 = Edge::from(0, 1, 2, 0.0);
     let edge2 = Edge::from(1, 2, 1, 0.0);
@@ -285,6 +299,7 @@ fn undirected_graph() -> Graph {
         edge8, edge9, edge10, edge11, edge12, edge13, edge14]));
 }
 
+#[cfg(test)]
 fn directed_graph() -> Graph {
     let edge1 = Edge::from(0, 4, 0, 7.0);
     let edge2 = Edge::from(1, 0, 2, 12.0);
@@ -296,6 +311,7 @@ fn directed_graph() -> Graph {
     return Graph::from(Vec::from([edge1, edge2, edge3, edge4, edge5, edge6]));
 }
 
+#[cfg(test)]
 fn graphs_with_one_connection() -> Graph {
     let edge1 = Edge::from(0, 0, 4, 1.0);
     let edge2 = Edge::from(1, 1, 4, 2.0);
@@ -334,6 +350,7 @@ fn graphs_with_one_connection() -> Graph {
         edge21, edge22, edge23, edge24, edge25, edge26, edge27, edge28]));
 }
 
+#[cfg(test)]
 fn stubbed_path() -> Waypoint {
     let start_point = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), Node {
         id: 0,
