@@ -9,6 +9,7 @@ This library will contain standard path finding algorithms and return the result
   * [Depth-first search](#depth-first-search)
   * [Breadth-first search](#breadth-first-search)
   * [Bidirectional breadth-first search](#bidirectional-breadth-first-search)
+  * [Dijkstra path search](#dijkstra-path-search)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -19,6 +20,7 @@ This library will contain standard path finding algorithms and return the result
 - find path with depth-first search
 - find path with breadth-first search
 - find path with bidirectional breadth-first search
+- find path with the dijkstra algorithm
 
 Download the crate: https://crates.io/search?q=path-finding-lib
 
@@ -113,6 +115,18 @@ pub fn your_function() {
         1 /* target */, 
         &graph, 
         Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding> /* used algorithm */
+    );
+}
+```
+
+### Dijkstra path search
+```rust
+pub fn your_function() {
+    let dfs = path::find(
+        4 /* source */, 
+        1 /* target */, 
+        &graph,
+        Box::from(Dijkstra {}) as Box<dyn PathFinding> /* used algorithm */
     );
 }
 ```
