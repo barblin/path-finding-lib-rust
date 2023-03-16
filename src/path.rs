@@ -266,11 +266,11 @@ fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection()
 
 #[test]
 fn should_find_path_with_dijkstra_in_graphs_with_one_connection() {
-    let bfs = find(0, 13, &graphs_with_one_connection(),
+    let dijkstra = find(0, 13, &graphs_with_one_connection(),
                    Box::from(crate::dijkstra::Dijkstra {}) as Box<dyn PathFinding>);
 
     let mut total_cost: f32 = 0.0;
-    for edge in bfs.edges {
+    for edge in dijkstra.edges {
         total_cost += edge.weight;
     }
 
