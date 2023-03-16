@@ -1,8 +1,8 @@
-use crate::probing::probe;
+use crate::search::probing::probe;
 
 use crate::graph::{Graph, Node};
 use crate::path::PathFinding;
-use crate::probing;
+use crate::search::probing;
 
 pub struct DepthFirstSearch {}
 
