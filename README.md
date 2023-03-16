@@ -98,7 +98,7 @@ pub fn your_function() {
 ### Breadth-first search
 ```rust
 pub fn your_function() {
-    let dfs = path::find(
+    let bfs = path::find(
         4 /* source */, 
         1 /* target */, 
         &graph, 
@@ -110,7 +110,7 @@ pub fn your_function() {
 ### Bidirectional breadth-first search
 ```rust
 pub fn your_function() {
-    let dfs = path::find(
+    let bi_bfs = path::find(
         4 /* source */, 
         1 /* target */, 
         &graph, 
@@ -122,7 +122,7 @@ pub fn your_function() {
 ### Dijkstra path search
 ```rust
 pub fn your_function() {
-    let dfs = path::find(
+    let dijkstra = path::find(
         4 /* source */, 
         1 /* target */, 
         &graph,
