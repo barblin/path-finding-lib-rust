@@ -1,7 +1,7 @@
 use crate::graph::{Graph, Node};
 use crate::path::PathFinding;
-use crate::probing;
-use crate::probing::{bi_directional_probe, probe};
+use crate::search::probing;
+use crate::search::probing::{bi_directional_probe, probe};
 
 pub struct BreadthFirstSearch {}
 
