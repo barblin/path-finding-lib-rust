@@ -10,36 +10,47 @@ pub struct BreadthFirstSearch {}
 
 pub struct Dijkstra {}
 
+pub(crate) fn dijkstra(source: Node,
+                       target: Node,
+                       graph: &Graph,
+                       heuristic: &dyn Fn(usize, usize, &Graph) -> f32) -> Graph {
+    let mut visited: HashSet<usize> = HashSet::new();
+    let mut edges_for_node_id: HashMap<usize, Vec<Edge>> = HashMap::new();
+    let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
+
+    queue.push(source.id, NotNan::new(0.0).unwrap());
+    edges_for_node_id.insert(source.id, Vec::new());
+
+    while !visited.contains(&target.id) && !queue.is_empty() {
+        let node = queue.pop_min().unwrap();
+        visited.insert(node.0);
+
+        let edges = graph.nodes_lookup.get(&node.0).unwrap().edges.clone();
+        for edge in edges {
+            if !visited.contains(&edge.destination) {
+                let cost = node.1 + edge.weight + heuristic(edge.source, target.id, graph);
+                queue.push(edge.destination, cost);
+
+                let mut from_edges = edges_for_node_id.get(&node.0).unwrap().clone();
+                from_edges.push(edge.clone());
+                edges_for_node_id.insert(edge.destination, from_edges);
+            }
+        }
+    }
+
+    return match edges_for_node_id.get(&target.id) {
+        None => Graph::from(Vec::new()),
+        Some(edges) => Graph::from(edges.clone())
+    };
+}
+
+fn dijkstra_heuristic(_source: usize, _destination: usize, _graph: &Graph) -> f32 {
+    return 0.0;
+}
 
 impl PathFinding for Dijkstra {
     fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {
-        let mut visited: HashSet<usize> = HashSet::new();
-        let mut edges_for_node_id: HashMap<usize, Vec<Edge>> = HashMap::new();
-        let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
-
-        queue.push(source.id, NotNan::new(0.0).unwrap());
-        edges_for_node_id.insert(source.id, Vec::new());
-
-        while !visited.contains(&target.id) && !queue.is_empty() {
-            let node = queue.pop_min().unwrap();
-            visited.insert(node.0);
-
-            let edges = graph.nodes_lookup.get(&node.0).unwrap().edges.clone();
-            for edge in edges {
-                if !visited.contains(&edge.destination) {
-                    queue.push(edge.destination, node.1 + edge.weight);
-
-                    let mut from_edges = edges_for_node_id.get(&node.0).unwrap().clone();
-                    from_edges.push(edge.clone());
-                    edges_for_node_id.insert(edge.destination, from_edges);
-                }
-            }
-        }
-
-        return match edges_for_node_id.get(&target.id) {
-            None => Graph::from(Vec::new()),
-            Some(edges) => Graph::from(edges.clone())
-        };
+        return dijkstra(source, target, graph, &dijkstra_heuristic);
     }
 }
 
