@@ -3,7 +3,8 @@ use std::collections::{HashMap, HashSet};
 use ordered_float::NotNan;
 use priority_queue::DoublePriorityQueue;
 
-use crate::graph::{Edge, Graph, Node};
+use crate::graph::{Edge, Graph};
+use crate::node::Node;
 use crate::path::PathFinding;
 
 pub struct BreadthFirstSearch {}

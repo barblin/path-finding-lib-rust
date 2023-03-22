@@ -1,4 +1,5 @@
-use crate::{graph::{Graph, Node}, path::PathFinding};
+use crate::{graph::Graph, path::PathFinding};
+use crate::node::Node;
 use crate::search::dijkstra;
 
 pub struct AStar {

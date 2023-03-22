@@ -1,6 +1,7 @@
 use std::collections::{HashMap, LinkedList};
 
-use crate::graph::{Edge, Graph, Node};
+use crate::graph::{Edge, Graph};
+use crate::node::Node;
 use crate::path;
 use crate::path::Waypoint;
 
