@@ -1,5 +1,6 @@
 #[cfg(test)]
 use std::collections::HashMap;
+
 use crate::{graph::Graph, path::PathFinding};
 #[cfg(test)]
 use crate::graph::Edge;
@@ -33,9 +34,8 @@ pub fn manhattan_distance(source: usize, destination: usize, graph: &Graph) -> f
 }
 
 pub struct AStar {
-    heuristic: dyn Fn(usize, usize, &Graph) -> f32,
+    pub heuristic: Box<dyn Fn(usize, usize, &Graph) -> f32>,
 }
-
 
 impl PathFinding for AStar {
     fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {

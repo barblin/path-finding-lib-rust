@@ -84,10 +84,6 @@ impl Graph {
         return sorted_edges;
     }
 
-    pub fn has_node_positions(&self) -> bool {
-        return self.node_position_lookup.is_some();
-    }
-
     pub fn offer_positions(&mut self, node_positions: HashMap<usize, Position>) {
         self.node_position_lookup = Some(node_positions);
     }
@@ -213,7 +209,6 @@ fn create_initial_graph_should_not_have_node_positions() {
     let edge = Edge::from(0, 2, 3, 0.5);
     let graph = Graph::from(Vec::from([edge]));
 
-    assert!(!graph.has_node_positions());
     assert!(graph.node_position_lookup.is_none());
 }
 
@@ -228,7 +223,6 @@ fn offer_node_positions_should_set_node_positions() {
 
     graph.offer_positions(node_positions);
 
-    assert!(graph.has_node_positions());
     assert!(graph.node_position_lookup.is_some());
 
     let position_lookup = graph.node_position_lookup.unwrap();

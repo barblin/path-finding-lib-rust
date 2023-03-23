@@ -1,6 +1,17 @@
+#[cfg(test)]
+use std::collections::HashMap;
 use std::collections::HashSet;
+
 use crate::{graph::{Edge, Graph}};
 use crate::node::Node;
+#[cfg(test)]
+use crate::search::AStar;
+#[cfg(test)]
+use crate::search::breadth_first::{BiBreadthFirstSearch, BreadthFirstSearch};
+#[cfg(test)]
+use crate::search::depth_first::DepthFirstSearch;
+#[cfg(test)]
+use crate::search::dijkstra::Dijkstra;
 
 #[derive(Clone)]
 pub(crate) struct Waypoint {
@@ -54,13 +65,6 @@ pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
 
 // Testing
 
-#[cfg(test)]
-use crate::search::breadth_first::{BreadthFirstSearch, BiBreadthFirstSearch};
-#[cfg(test)]
-use crate::search::depth_first::DepthFirstSearch;
-#[cfg(test)]
-use crate::search::dijkstra::Dijkstra;
-
 #[test]
 fn walk_back_with_only_one_waypoint_should_succeed() {
     let waypoint = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), Node {
@@ -103,8 +107,7 @@ fn walk_back_with_path_should_succeed() {
 #[test]
 fn should_find_path_with_depth_first_search_in_undirected_graph() {
     let graph = undirected_graph();
-    let dfs = find(0, 2, &graph,
-                   Box::from(DepthFirstSearch {}) as Box<dyn PathFinding>);
+    let dfs = find(0, 2, &graph, Box::from(DepthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in dfs.edges {
@@ -116,8 +119,7 @@ fn should_find_path_with_depth_first_search_in_undirected_graph() {
 
 #[test]
 fn should_find_path_with_depth_first_search_in_directed_graph() {
-    let dfs = find(4, 1, &directed_graph(),
-                   Box::from(DepthFirstSearch {}) as Box<dyn PathFinding>);
+    let dfs = find(4, 1, &directed_graph(), Box::from(DepthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in dfs.edges {
@@ -131,7 +133,7 @@ fn should_find_path_with_depth_first_search_in_directed_graph() {
 fn should_find_path_with_breadth_first_search_in_undirected_graph() {
     let graph = undirected_graph();
     let bfs = find(0, 2, &graph,
-                   Box::from(crate::search::breadth_first::BreadthFirstSearch {}) as Box<dyn PathFinding>);
+                   Box::from(crate::search::breadth_first::BreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
@@ -143,8 +145,7 @@ fn should_find_path_with_breadth_first_search_in_undirected_graph() {
 
 #[test]
 fn should_find_path_with_breadth_first_search_in_directed_graph() {
-    let bfs = find(4, 1, &directed_graph(),
-                   Box::from(BreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(4, 1, &directed_graph(), Box::from(BreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
@@ -157,8 +158,7 @@ fn should_find_path_with_breadth_first_search_in_directed_graph() {
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_undirected_graph() {
     let graph = undirected_graph();
-    let bfs = find(0, 2, &graph,
-                   Box::from(BreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(0, 2, &graph, Box::from(BreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
@@ -170,8 +170,7 @@ fn should_find_path_with_bi_breadth_first_search_in_undirected_graph() {
 
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
-    let bfs = find(4, 1, &directed_graph(),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(4, 1, &directed_graph(), Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
@@ -185,8 +184,7 @@ fn should_find_path_with_bi_breadth_first_search_in_directed_graph() {
 fn should_find_path_with_one_edge() {
     let mut edges = Vec::new();
     edges.push(Edge::from(0, 0, 1, 1.0));
-    let bfs = find(0, 1, &Graph::from(edges),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(0, 1, &Graph::from(edges), Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in &bfs.edges {
@@ -201,8 +199,7 @@ fn should_find_path_with_one_edge() {
 fn should_not_find_path_with_same_target_and_source() {
     let mut edges = Vec::new();
     edges.push(Edge::from(0, 0, 1, 1.0));
-    let bfs = find(1, 1, &Graph::from(edges),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(1, 1, &Graph::from(edges), Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in &bfs.edges {
@@ -217,8 +214,7 @@ fn should_not_find_path_with_same_target_and_source() {
 fn should_not_find_path_with_unknown_target() {
     let mut edges = Vec::new();
     edges.push(Edge::from(0, 0, 1, 1.0));
-    let bfs = find(0, 2, &Graph::from(edges),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(0, 2, &Graph::from(edges), Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in &bfs.edges {
@@ -233,8 +229,7 @@ fn should_not_find_path_with_unknown_target() {
 fn should_not_find_path_with_unknown_source() {
     let mut edges = Vec::new();
     edges.push(Edge::from(0, 0, 1, 1.0));
-    let bfs = find(2, 0, &Graph::from(edges),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(2, 0, &Graph::from(edges), Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in &bfs.edges {
@@ -249,8 +244,7 @@ fn should_not_find_path_with_unknown_source() {
 fn should_find_path_with_source_and_target_reversed() {
     let mut edges = Vec::new();
     edges.push(Edge::from(0, 0, 1, 1.0));
-    let bfs = find(1, 0, &Graph::from(edges),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+    let bfs = find(1, 0, &Graph::from(edges), Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in &bfs.edges {
@@ -261,10 +255,72 @@ fn should_find_path_with_source_and_target_reversed() {
     assert_eq!(1, bfs.edges.len());
 }
 
+#[cfg(test)]
+fn a_star_edges() -> Vec<Edge> {
+    return Vec::from([
+        Edge::from(0, 0, 1, 1.0),
+        Edge::from(1, 0, 2, 1.0),
+        Edge::from(2, 1, 3, 1.0),
+        Edge::from(3, 2, 3, 2.0),
+        Edge::from(4, 3, 4, 3.0),
+    ]);
+}
+
+#[cfg(test)]
+fn inconsistent(source: usize, destination: usize, _graph: &Graph) -> f32 {
+    return HashMap::from([
+        ((0, 4), 2.0),
+        ((1, 4), 4.0),
+        ((2, 4), 1.0),
+        ((3, 4), 1.0),
+        ((4, 4), 0.0)
+    ]).get(&(source, destination)).unwrap().clone();
+}
+
+#[test]
+fn should_find_path_with_a_star_and_inconsistent_heuristic() {
+    let a_star = find(0, 4, &Graph::from(a_star_edges()),
+                      Box::from( AStar { heuristic: Box::from(inconsistent) }));
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &a_star.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(6.0, total_cost);
+    assert_eq!(3, a_star.edges.len());
+}
+
+#[cfg(test)]
+fn consistent(source: usize, destination: usize, _graph: &Graph) -> f32 {
+    return HashMap::from([
+        ((0, 4), 2.0),
+        ((1, 4), 1.0),
+        ((2, 4), 1.0),
+        ((3, 4), 1.0),
+        ((4, 4), 0.0)
+    ]).get(&(source, destination)).unwrap().clone();
+}
+
+#[test]
+fn should_find_path_with_a_star_and_consistent_heuristic() {
+    let algo = AStar { heuristic: Box::from(consistent) };
+    let a_star = find(0, 4, &Graph::from(a_star_edges()),
+                      Box::from(algo));
+
+    let mut total_cost: f32 = 0.0;
+    for edge in &a_star.edges {
+        total_cost += edge.weight;
+    }
+
+    assert_eq!(5.0, total_cost);
+    assert_eq!(3, a_star.edges.len());
+}
+
 #[test]
 fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection() {
     let bfs = find(0, 13, &graphs_with_one_connection(),
-                   Box::from(BiBreadthFirstSearch {}) as Box<dyn PathFinding>);
+                   Box::from(BiBreadthFirstSearch {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in bfs.edges {
@@ -277,7 +333,7 @@ fn should_find_path_with_bi_breadth_first_search_in_graphs_with_one_connection()
 #[test]
 fn should_find_path_with_dijkstra_in_graphs_with_one_connection() {
     let dijkstra = find(0, 13, &graphs_with_one_connection(),
-                   Box::from(Dijkstra {}) as Box<dyn PathFinding>);
+                        Box::from(Dijkstra {}));
 
     let mut total_cost: f32 = 0.0;
     for edge in dijkstra.edges {
