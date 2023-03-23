@@ -2,6 +2,7 @@ pub mod a_star;
 pub mod breadth_first;
 pub mod depth_first;
 pub mod dijkstra;
+pub mod hierarchical_a_star;
 pub(crate) mod probing;
 
 pub use a_star::*;
