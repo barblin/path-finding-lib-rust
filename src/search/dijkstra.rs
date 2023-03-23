@@ -29,7 +29,7 @@ pub(crate) fn dijkstra(source: Node,
         let edges = graph.nodes_lookup.get(&node.0).unwrap().edges.clone();
         for edge in edges {
             if !visited.contains(&edge.destination) {
-                let cost = node.1 + edge.weight + heuristic(edge.source, target.id, graph);
+                let cost = node.1 + edge.weight + heuristic(edge.destination, target.id, graph);
                 queue.push(edge.destination, cost);
 
                 let mut from_edges = edges_for_node_id.get(&node.0).unwrap().clone();
