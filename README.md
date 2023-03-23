@@ -31,7 +31,7 @@ markdown-toc</a></i></small>
   - euclidean distance
   - manhattan distance
 
-Download the crate: https://crates.io/search?q=path-finding-lib
+Download the crate: https://crates.io/crates/path-finding
 
 ## How to use
 
