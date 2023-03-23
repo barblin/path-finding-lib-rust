@@ -1,5 +1,6 @@
 use std::collections::HashSet;
-use crate::{graph::{Edge, Graph, Node}};
+use crate::{graph::{Edge, Graph}};
+use crate::node::Node;
 
 #[derive(Clone)]
 pub(crate) struct Waypoint {

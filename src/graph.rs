@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use derivative::Derivative;
 
+use crate::node::{Node, Position};
 use crate::union_find::UnionFind;
 
 #[derive(Derivative)]
@@ -26,15 +27,10 @@ impl Edge {
     }
 }
 
-#[derive(Clone)]
-pub struct Node {
-    pub id: usize,
-    pub edges: Vec<Edge>,
-}
-
 pub struct Graph {
     pub edges_lookup: HashMap<usize, Edge>,
     pub nodes_lookup: HashMap<usize, Node>,
+    pub node_position_lookup: Option<HashMap<usize, Position>>,
     pub edges: Vec<Edge>,
     pub node_count: usize,
 }
@@ -52,13 +48,14 @@ impl Graph {
 
         let mut nodes: HashMap<usize, Node> = HashMap::new();
         for (k, v) in node_map {
-            nodes.insert(k.clone(), Node { id: k.clone(), edges: v.to_vec() });
+            nodes.insert(k.clone(), Node::from(k.clone(), v.to_vec()));
             node_count += 1;
         }
 
         Graph {
             nodes_lookup: nodes,
             edges_lookup: edge_map,
+            node_position_lookup: None,
             edges,
             node_count,
         }
@@ -67,6 +64,7 @@ impl Graph {
     pub fn from_adjacency_matrix(matrix: &[&[f32]]) -> Graph {
         let mut index: usize = 0;
         let mut vec: Vec<Edge> = Vec::new();
+
         for (row, array) in matrix.iter().enumerate() {
             for (col, weight) in array.iter().enumerate() {
                 if !weight.eq(&(0.0 as f32)) {
@@ -84,6 +82,14 @@ impl Graph {
         sorted_edges.sort_by(|edge1, edge2|
             edge1.weight.total_cmp(&edge2.weight));
         return sorted_edges;
+    }
+
+    pub fn has_node_positions(&self) -> bool {
+        return self.node_position_lookup.is_some();
+    }
+
+    pub fn offer_positions(&mut self, node_positions: HashMap<usize, Position>) {
+        self.node_position_lookup = Some(node_positions);
     }
 }
 
@@ -200,4 +206,32 @@ fn create_graph_from_adjacency_matrix() {
     assert_eq!(2, graph.nodes_lookup.get(&0).unwrap().edges.len());
     assert_eq!(3, graph.nodes_lookup.get(&8).unwrap().edges.len());
     assert_eq!(2.0, graph.nodes_lookup.get(&8).unwrap().edges[0].weight);
+}
+
+#[test]
+fn create_initial_graph_should_not_have_node_positions() {
+    let edge = Edge::from(0, 2, 3, 0.5);
+    let graph = Graph::from(Vec::from([edge]));
+
+    assert!(!graph.has_node_positions());
+    assert!(graph.node_position_lookup.is_none());
+}
+
+#[test]
+fn offer_node_positions_should_set_node_positions() {
+    let edge = Edge::from(0, 2, 3, 0.5);
+    let mut graph = Graph::from(Vec::from([edge.clone()]));
+
+    let mut node_positions: HashMap<usize, Position> = HashMap::new();
+    node_positions.insert((&edge).source.clone(), Position::from(0.3, 0.2, 0.0));
+    node_positions.insert((&edge).destination.clone(), Position::from(0.1, 0.5, 0.0));
+
+    graph.offer_positions(node_positions);
+
+    assert!(graph.has_node_positions());
+    assert!(graph.node_position_lookup.is_some());
+
+    let position_lookup = graph.node_position_lookup.unwrap();
+    assert_eq!(0.3, position_lookup.get(&(&edge).source).unwrap().x);
+    assert_eq!(0.1, position_lookup.get(&(&edge).destination).unwrap().x);
 }

@@ -1,4 +1,5 @@
-use crate::graph::{Graph, Node};
+use crate::graph::Graph;
+use crate::node::Node;
 use crate::path::PathFinding;
 use crate::search::probing;
 use crate::search::probing::{bi_directional_probe, probe};
