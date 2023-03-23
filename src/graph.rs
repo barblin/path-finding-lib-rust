@@ -64,6 +64,7 @@ impl Graph {
     pub fn from_adjacency_matrix(matrix: &[&[f32]]) -> Graph {
         let mut index: usize = 0;
         let mut vec: Vec<Edge> = Vec::new();
+
         for (row, array) in matrix.iter().enumerate() {
             for (col, weight) in array.iter().enumerate() {
                 if !weight.eq(&(0.0 as f32)) {
