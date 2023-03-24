@@ -21,15 +21,18 @@ markdown-toc</a></i></small>
 
 <b>Currently supported</b>:
 
-- construct graphs
-- create minimum spanning tree from graph
-- find path with depth-first search
-- find path with breadth-first search
-- find path with bidirectional breadth-first search
-- find path with the dijkstra algorithm
-- find path with the A* algorithm, with heuristic function:
-  - euclidean distance
-  - manhattan distance
+- Construct graphs
+- Create Minimum Spanning Tree (MST) from a graph
+- Find path with Depth-First Search (DFS)
+- Find path with Breadth-First Search (BFS)
+- Find path with Bidirectional Breadth-First Search (BBFS)
+- Find path with the Dijkstra algorithm 
+- Find path with the A* algorithm, with heuristic:
+  - Euclidean distance
+  - Manhattan distance
+- Find path with a Hierarchical Path-Finding A* (HPA*), with heuristic:
+  - Euclidean distance
+  - Manhattan distance
 
 Download the crate: https://crates.io/crates/path-finding
 
@@ -200,6 +203,27 @@ pub fn your_function_with_manhattan_distance() {
         1 /* target */,
         &graph,
         Box::from( AStar { heuristic: Box::from(manhattan_distance) }), /* used algorithm + manhattan distance heuristic function */
+    );
+}
+```
+
+
+### Hierarchical A* path search
+Similar to the A* path-finding algorithm, you can provide either an existing heuristic function as shown in the previous section. Or you
+provide your own heuristic function. In case you use an existing heuristic function, make sure to provide the positional
+information for the nodes.
+
+In addition to the functionality of A*, this algorithm will require you to pass the graph to the Hierarchical A* instance.
+The reason is simple, the algorithm will divide the graph into segments on creation and cache information required in 
+the subsequent path-finding process.
+
+```rust
+pub fn your_function_with_euclidean_distance() {
+    let a_star = path::find(
+        4 /* source */,
+        1 /* target */,
+        &graph,
+        Box::from( HierarchicalAStar { heuristic, graph }), /* used algorithm and graph */
     );
 }
 ```
