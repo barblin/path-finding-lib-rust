@@ -50,7 +50,7 @@ fn dijkstra_heuristic(_source: usize, _destination: usize, _graph: &Graph) -> f3
 }
 
 impl PathFinding for Dijkstra {
-    fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {
+    fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
         return dijkstra(source, target, graph, &dijkstra_heuristic);
     }
 }
@@ -60,8 +60,8 @@ fn should_find_path_with_dijkstra_between_a_and_b() {
     let graph = graph();
 
     let dij = Dijkstra {};
-    let path = dij.execute(graph.nodes_lookup.get(&0).unwrap().clone(),
-                           graph.nodes_lookup.get(&1).unwrap().clone(), &graph);
+    let path = dij.graph(graph.nodes_lookup.get(&0).unwrap().clone(),
+                         graph.nodes_lookup.get(&1).unwrap().clone(), &graph);
 
     assert_eq!(3.0, calc_cost(&path.edges));
     assert_eq!(2, path.edges.len());
@@ -72,7 +72,7 @@ fn should_find_path_with_dijkstra_between_a_and_c() {
     let graph = graph();
 
     let dij = Dijkstra {};
-    let path = dij.execute(get_node(0, &graph), get_node(2, &graph), &graph);
+    let path = dij.graph(get_node(0, &graph), get_node(2, &graph), &graph);
 
 
     assert_eq!(2.0, calc_cost(&path.edges));
@@ -84,7 +84,7 @@ fn should_find_path_with_dijkstra_between_a_and_d() {
     let graph = graph();
 
     let dij = Dijkstra {};
-    let path = dij.execute(get_node(0, &graph), get_node(3, &graph), &graph);
+    let path = dij.graph(get_node(0, &graph), get_node(3, &graph), &graph);
 
 
     assert_eq!(5.0, calc_cost(&path.edges));
@@ -96,7 +96,7 @@ fn should_find_path_with_dijkstra_between_a_and_e() {
     let graph = graph();
 
     let dij = Dijkstra {};
-    let path = dij.execute(get_node(0, &graph), get_node(4, &graph), &graph);
+    let path = dij.graph(get_node(0, &graph), get_node(4, &graph), &graph);
 
 
     assert_eq!(6.0, calc_cost(&path.edges));
@@ -108,7 +108,7 @@ fn should_find_path_with_disjoint_graphs() {
     let graph = disjoint_graph();
 
     let dij = Dijkstra {};
-    let path = dij.execute(get_node(0, &graph), get_node(3, &graph), &graph);
+    let path = dij.graph(get_node(0, &graph), get_node(3, &graph), &graph);
 
     assert_eq!(0.0, calc_cost(&path.edges));
     assert_eq!(0, path.edges.len());

@@ -7,7 +7,7 @@ use crate::search::probing::probe;
 pub struct DepthFirstSearch {}
 
 impl PathFinding for DepthFirstSearch {
-    fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {
+    fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
         return probe(source.clone(), target.id, graph, probing::pop);
     }
 }

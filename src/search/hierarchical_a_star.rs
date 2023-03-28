@@ -6,7 +6,7 @@ pub struct HierarchicalAStar {
 }
 
 impl PathFinding for HierarchicalAStar {
-    fn execute(&self, _source: Node, _target: Node, _graph: &Graph) -> Graph {
+    fn graph(&self, _source: Node, _target: Node, _graph: &Graph) -> Graph {
         return Graph::from(Vec::new());
     }
 }

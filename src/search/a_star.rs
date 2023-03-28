@@ -38,7 +38,7 @@ pub struct AStar {
 }
 
 impl PathFinding for AStar {
-    fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {
+    fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
         return dijkstra(source, target, graph, &self.heuristic);
     }
 }

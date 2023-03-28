@@ -9,13 +9,13 @@ pub struct BreadthFirstSearch {}
 pub struct BiBreadthFirstSearch {}
 
 impl PathFinding for BreadthFirstSearch {
-    fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {
+    fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
         return probe(source.clone(), target.id, graph, probing::dequeue);
     }
 }
 
 impl PathFinding for BiBreadthFirstSearch {
-    fn execute(&self, source: Node, target: Node, graph: &Graph) -> Graph {
+    fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
         return bi_directional_probe(source, target, graph);
     }
 }
