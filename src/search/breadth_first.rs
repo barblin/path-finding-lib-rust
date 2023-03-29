@@ -11,7 +11,7 @@ pub struct BiBreadthFirstSearch {}
 
 impl PathFinding for BreadthFirstSearch {
     fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
-        return probe(source.clone(), target.id, graph, probing::dequeue);
+        return probe(source.id, target.id, graph, probing::dequeue);
     }
 
     fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid) -> Graph {
