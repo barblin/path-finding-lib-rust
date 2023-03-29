@@ -15,23 +15,20 @@ pub(crate) fn dequeue(queue: &mut LinkedList<Waypoint>) -> Waypoint {
     return queue.pop_front().unwrap();
 }
 
-pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Callback) -> Graph {
+pub(crate) fn probe(start: usize, target: usize, graph: &Graph, control_flow: Callback) -> Graph {
     let deque = &mut LinkedList::from([Waypoint::from(None, start, None)]);
     let mut visited: Vec<usize> = Vec::new();
 
     while !deque.is_empty() {
         let current = (control_flow)(deque);
-        let edges = current.node.edges.clone();
-        visited.push(current.node.id);
+        let edges = graph.nodes_lookup.get(&current.node_id).unwrap().edges.clone();
+        visited.push(current.node_id);
 
         for edge in edges {
             let destination = edge.destination;
 
-            let waypoint = Waypoint::from(
-                Some(edge.clone()),
-                graph.nodes_lookup.get(&destination).unwrap().clone(),
-                Some(Box::new(current.clone())),
-            );
+            let waypoint = Waypoint::from(Some(edge.clone()), destination,
+                                          Some(Box::new(current.clone())), );
 
             if !visited.contains(&destination) {
                 deque.push_back(waypoint)
@@ -48,9 +45,9 @@ pub(crate) fn probe(start: Node, target: usize, graph: &Graph, control_flow: Cal
 
 pub(crate) fn bi_directional_probe(start: Node, target: Node, graph: &Graph) -> Graph {
     let start_queue = &mut LinkedList::from([Waypoint::from(
-        None, start.clone(), None)]);
+        None, start.id, None)]);
     let target_queue = &mut LinkedList::from([Waypoint::from(
-        None, target.clone(), None)]);
+        None, target.id, None)]);
 
     let mut start_visited: HashMap<usize, Waypoint> = HashMap::new();
     let mut target_visited: HashMap<usize, Waypoint> = HashMap::new();
@@ -81,10 +78,9 @@ fn process_node(queue: &mut LinkedList<Waypoint>,
                 graph: &Graph) -> Option<Vec<Edge>> {
     let current = dequeue(queue);
 
-    let result = process_edges(queue, &current, end.id,
-                               graph, &visited, &end_visited);
+    let result = process_edges(queue, &current, end.id, graph, &visited, &end_visited);
 
-    visited.insert(current.node.id, current.clone());
+    visited.insert(current.node_id, current.clone());
 
     return result;
 }
@@ -97,15 +93,13 @@ fn process_edges(
     visited: &HashMap<usize, Waypoint>,
     other_visited: &HashMap<usize, Waypoint>) -> Option<Vec<Edge>>
 {
-    let edges = current.node.edges.clone();
+    let edges = graph.nodes_lookup.get(&current.node_id).unwrap().edges.clone();
 
     for edge in edges {
         let destination = edge.destination;
 
-        let waypoint = Waypoint::from(
-            Some(edge), graph.nodes_lookup.get(&destination).unwrap().clone(),
-            Some(Box::new(current.clone())),
-        );
+        let waypoint = Waypoint::from(Some(edge), destination,
+                                      Some(Box::new(current.clone())), );
 
         if destination == target {
             return Some(path::walk_back(waypoint).into_iter().collect());

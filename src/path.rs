@@ -18,15 +18,15 @@ use crate::search::dijkstra::Dijkstra;
 pub(crate) struct Waypoint {
     pub leg: Option<Edge>,
     pub previous: Option<Box<Waypoint>>,
-    pub node: Node,
+    pub node_id: usize,
 }
 
 impl Waypoint {
-    pub fn from(edge: Option<Edge>, node: Node, previous: Option<Box<Waypoint>>) -> Waypoint {
+    pub fn from(edge: Option<Edge>, node_id: usize, previous: Option<Box<Waypoint>>) -> Waypoint {
         return Waypoint {
             leg: edge,
             previous,
-            node,
+            node_id,
         };
     }
 }
@@ -78,10 +78,7 @@ pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
 
 #[test]
 fn walk_back_with_only_one_waypoint_should_succeed() {
-    let waypoint = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), Node {
-        id: 1,
-        edges: Vec::new(),
-    }, None);
+    let waypoint = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), 1, None);
 
     let mut sum_weight = 0.0;
     for edge in walk_back(waypoint) {
@@ -93,10 +90,7 @@ fn walk_back_with_only_one_waypoint_should_succeed() {
 
 #[test]
 fn walk_back_without_leg_should_succeed() {
-    let waypoint = Waypoint::from(None, Node {
-        id: 1,
-        edges: Vec::new(),
-    }, None);
+    let waypoint = Waypoint::from(None, 1, None);
 
     let edges = walk_back(waypoint);
     assert_eq!(0, edges.len());
@@ -429,18 +423,12 @@ fn graphs_with_one_connection() -> Graph {
 
 #[cfg(test)]
 fn stubbed_path() -> Waypoint {
-    let start_point = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), Node {
-        id: 0,
-        edges: Vec::new(),
-    }, None);
+    let start_point = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), 0, None);
 
     let mut current = start_point;
     for i in 0..10 {
         let edge_stub = Some(Edge::from(i, 0, 1, 1.0));
-        current = Waypoint::from(edge_stub.clone(), Node {
-            id: 0,
-            edges: Vec::new(),
-        }, Some(Box::from(current.clone())))
+        current = Waypoint::from(edge_stub.clone(), 0, Some(Box::from(current.clone())))
     }
 
     return current.clone();

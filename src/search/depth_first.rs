@@ -9,7 +9,7 @@ pub struct DepthFirstSearch {}
 
 impl PathFinding for DepthFirstSearch {
     fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
-        return probe(source.clone(), target.id, graph, probing::pop);
+        return probe(source.id, target.id, graph, probing::pop);
     }
 
     fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid) -> Graph {
