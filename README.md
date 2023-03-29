@@ -155,11 +155,7 @@ pub fn your_function() {
 }
 ```
 
-<<<<<<< HEAD
-### Graph operations
-=======
 ### Grid operations
->>>>>>> 2fd10b7 (version 0.3.5: grid functions)
 
 #### outside
 Check if a position is outside the grid. Pass a coordinate to the function below.
