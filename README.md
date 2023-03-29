@@ -10,7 +10,7 @@ This library will contain standard path finding algorithms and return the result
     + [sorted_by_weight_asc](#sorted-by-weight-asc)
     + [offer_positions](#offer-positions)
   * [Create Grid](#create-grid)
-  * [Graph operations](#graph-operations-1)
+  * [Grid operations](#grid-operations)
     + [outside](#outside)
     + [within](#within)
     + [node_id](#node-id)
@@ -155,7 +155,11 @@ pub fn your_function() {
 }
 ```
 
+<<<<<<< HEAD
 ### Graph operations
+=======
+### Grid operations
+>>>>>>> 2fd10b7 (version 0.3.5: grid functions)
 
 #### outside
 Check if a position is outside the grid. Pass a coordinate to the function below.
