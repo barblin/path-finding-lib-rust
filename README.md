@@ -1,8 +1,7 @@
 # Path finding library
 
-<b>Beginner in Rust - Feedback highly appreciated!</b>
-
-This library will contain standard path finding algorithms and return the resulting path or graph object
+This library will contain standard path finding algorithms and return the resulting graph object. You can search for paths in 
+a graph based or grid based structure.
 
 - [How to use](#how-to-use)
   * [Create Graph](#create-graph)
@@ -148,9 +147,9 @@ algorithm.
 ```rust
 pub fn your_function() {
     let grid = grid::Grid::from(&[
-        &[4, 2, 1],
-        &[2, 1, 0],
-        &[3, 4, 7]
+        &[4.0, 2.0, 1.0],
+        &[2.0, 1.0, 0.0],
+        &[3.0, 4.0, 7.0]
     ]);
 }
 ```
@@ -203,13 +202,25 @@ pub fn your_function() {
 ```
 
 ### Depth-first search
-
+For graphs
 ```rust
 pub fn your_function() {
     let dfs = path::in_graph(
         4 /* source */,
         1 /* target */,
         &graph,
+        Box::from(DepthFirstSearch {}) /* used algorithm */
+    );
+}
+```
+
+For grids
+```rust
+pub fn your_function() {
+    let dfs = path::in_grid(
+        4 /* source */,
+        1 /* target */,
+        &grid,
         Box::from(DepthFirstSearch {}) /* used algorithm */
     );
 }

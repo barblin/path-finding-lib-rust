@@ -1,9 +1,9 @@
 use crate::graph::Graph;
-use crate::grid::Grid;
+use crate::grid::{Direction, Grid};
 use crate::node::Node;
 use crate::path::PathFinding;
 use crate::search::probing;
-use crate::search::probing::{bi_directional_probe, probe};
+use crate::search::probing::{bi_directional_probe, probe_graph};
 
 pub struct BreadthFirstSearch {}
 
@@ -11,10 +11,10 @@ pub struct BiBreadthFirstSearch {}
 
 impl PathFinding for BreadthFirstSearch {
     fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph {
-        return probe(source.id, target.id, graph, probing::dequeue);
+        return probe_graph(source.id, target.id, graph, probing::dequeue);
     }
 
-    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid) -> Graph {
+    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
         return Graph::from(Vec::new());
     }
 }
@@ -24,7 +24,7 @@ impl PathFinding for BiBreadthFirstSearch {
         return bi_directional_probe(source, target, graph);
     }
 
-    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid) -> Graph {
+    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
         return Graph::from(Vec::new());
     }
 }
