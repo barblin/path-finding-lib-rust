@@ -87,7 +87,7 @@ fn test_grid() -> Grid {
 }
 
 #[test]
-fn search_path_in_grid_should_be_successful() {
+fn depth_first_search_in_grid_should_be_successful() {
     let grid = test_grid();
 
     let dfs = in_grid((0, 0), (4, 4), &grid, Box::from(DepthFirstSearch {}), &[
@@ -105,7 +105,7 @@ fn search_path_in_grid_should_be_successful() {
 }
 
 #[test]
-fn search_path_in_grid_should_be_successful_with_only_four_directions() {
+fn depth_first_search_in_grid_should_be_successful_with_only_four_directions() {
     let grid = test_grid();
     let dfs = in_grid((0, 0), (4, 4), &grid, Box::from(DepthFirstSearch {}), &[
         Direction::Down,
@@ -115,6 +115,19 @@ fn search_path_in_grid_should_be_successful_with_only_four_directions() {
     ]);
 
     assert_eq!(10, dfs.edges.len())
+}
+
+#[test]
+fn breadth_first_search_should_be_successful() {
+    let grid = test_grid();
+    let dfs = in_grid((0, 0), (4, 4), &grid, Box::from(BreadthFirstSearch {}), &[
+        Direction::Down,
+        Direction::Right,
+        Direction::Up,
+        Direction::Left
+    ]);
+
+    assert_eq!(8, dfs.edges.len())
 }
 
 #[test]

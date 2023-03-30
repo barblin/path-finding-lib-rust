@@ -227,7 +227,7 @@ pub fn your_function() {
 ```
 
 ### Breadth-first search
-
+For graphs
 ```rust
 pub fn your_function() {
     let bfs = path::in_graph(
@@ -236,6 +236,18 @@ pub fn your_function() {
         &graph,
         Box::from(BreadthFirstSearch {}) /* used algorithm */
     );
+}
+```
+
+For grids
+```rust
+pub fn your_function() {
+  let dfs = path::in_grid(
+    4 /* source */,
+    1 /* target */,
+    &grid,
+    Box::from(BreadthFirstSearch {}) /* used algorithm */
+  );
 }
 ```
 
