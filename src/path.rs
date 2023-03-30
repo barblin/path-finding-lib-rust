@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 
 use crate::{graph::{Edge, Graph}};
-use crate::grid::Grid;
+use crate::grid::{Direction, Grid};
 use crate::node::Node;
 #[cfg(test)]
 use crate::search::AStar;
@@ -33,7 +33,7 @@ impl Waypoint {
 
 pub trait PathFinding {
     fn graph(&self, source: Node, target: Node, graph: &Graph) -> Graph;
-    fn grid(&self, source: (usize, usize), target: (usize, usize), grid: &Grid) -> Graph;
+    fn grid(&self, source: (usize, usize), target: (usize, usize), grid: &Grid, directions: &[Direction]) -> Graph;
 }
 
 pub fn in_graph(source: usize, target: usize, graph: &Graph, path_finding: Box<dyn PathFinding>) -> Graph {
@@ -48,12 +48,12 @@ pub fn in_graph(source: usize, target: usize, graph: &Graph, path_finding: Box<d
 }
 
 pub fn in_grid(source: (usize, usize), target: (usize, usize),
-               grid: &Grid, path_finding: Box<dyn PathFinding>) -> Graph {
+               grid: &Grid, path_finding: Box<dyn PathFinding>, directions: &[Direction]) -> Graph {
     if grid.outside(source) || grid.outside(target) {
         return Graph::from(Vec::new());
     };
 
-    return path_finding.grid(source, target, grid);
+    return path_finding.grid(source, target, grid, directions);
 }
 
 pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
@@ -75,6 +75,47 @@ pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
 
 
 // Testing
+#[cfg(test)]
+fn test_grid() -> Grid {
+    return Grid::from(&[
+        &[0.0, 0.0, 0.0, f32::MAX, 0.0],
+        &[f32::MAX, 0.0, 0.0, f32::MAX, f32::MAX],
+        &[0.0, 0.0, 0.0, f32::MAX, 0.0],
+        &[f32::MAX, 0.0, 0.0, 0.0, 0.0],
+        &[0.0, 0.0, f32::MAX, 0.0, 0.0],
+    ]);
+}
+
+#[test]
+fn search_path_in_grid_should_be_successful() {
+    let grid = test_grid();
+
+    let dfs = in_grid((0, 0), (4, 4), &grid, Box::from(DepthFirstSearch {}), &[
+        Direction::Up,
+        Direction::Down,
+        Direction::Left,
+        Direction::Right,
+        Direction::UpLeft,
+        Direction::UpRight,
+        Direction::DownLeft,
+        Direction::DownRight,
+    ]);
+
+    assert_eq!(4, dfs.edges.len())
+}
+
+#[test]
+fn search_path_in_grid_should_be_successful_with_only_four_directions() {
+    let grid = test_grid();
+    let dfs = in_grid((0, 0), (4, 4), &grid, Box::from(DepthFirstSearch {}), &[
+        Direction::Down,
+        Direction::Right,
+        Direction::Up,
+        Direction::Left
+    ]);
+
+    assert_eq!(10, dfs.edges.len())
+}
 
 #[test]
 fn walk_back_with_only_one_waypoint_should_succeed() {

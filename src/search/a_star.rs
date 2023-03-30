@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use crate::{graph::Graph, path::PathFinding};
 #[cfg(test)]
 use crate::graph::Edge;
-use crate::grid::Grid;
+use crate::grid::{Direction, Grid};
 use crate::node::{Node, Position3D};
 use crate::search::dijkstra;
 
@@ -43,7 +43,7 @@ impl PathFinding for AStar {
         return dijkstra(source, target, graph, &self.heuristic);
     }
 
-    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid) -> Graph {
+    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
         return Graph::from(Vec::new());
     }
 }

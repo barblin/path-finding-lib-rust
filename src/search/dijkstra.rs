@@ -4,7 +4,7 @@ use ordered_float::NotNan;
 use priority_queue::DoublePriorityQueue;
 
 use crate::graph::{Edge, Graph};
-use crate::grid::Grid;
+use crate::grid::{Direction, Grid};
 use crate::node::Node;
 use crate::path::PathFinding;
 
@@ -55,7 +55,7 @@ impl PathFinding for Dijkstra {
         return dijkstra(source, target, graph, &dijkstra_heuristic);
     }
 
-    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid) -> Graph {
+    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
         return Graph::from(Vec::new());
     }
 }
