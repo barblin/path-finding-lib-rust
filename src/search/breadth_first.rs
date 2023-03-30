@@ -3,7 +3,7 @@ use crate::grid::{Direction, Grid};
 use crate::node::Node;
 use crate::path::PathFinding;
 use crate::search::probing;
-use crate::search::probing::{bi_directional_probe, probe_graph};
+use crate::search::probing::{bi_directional_probe, probe_graph, probe_grid};
 
 pub struct BreadthFirstSearch {}
 
@@ -14,8 +14,8 @@ impl PathFinding for BreadthFirstSearch {
         return probe_graph(source.id, target.id, graph, probing::dequeue);
     }
 
-    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
-        return Graph::from(Vec::new());
+    fn grid(&self, source: (usize, usize), target: (usize, usize), grid: &Grid, directions: &[Direction]) -> Graph {
+        return probe_grid(source, target, grid, directions, probing::dequeue);
     }
 }
 
