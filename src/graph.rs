@@ -1,3 +1,4 @@
+use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
 use derivative::Derivative;
@@ -37,39 +38,38 @@ pub struct Graph {
 
 impl Graph {
     pub fn from(edges: Vec<Edge>) -> Graph {
-        let mut edge_map = HashMap::new();
-        let mut node_map: HashMap<usize, Vec<Edge>> = HashMap::new();
-        let mut node_count: usize = 0;
-
-        for edge in &edges {
-            edge_map.insert(edge.index.clone(), edge.clone());
-            add_edge_to_node_map(edge.source.clone(), edge.destination.clone(), edge.clone(), &mut node_map);
-        }
-
         let mut nodes: HashMap<usize, Node> = HashMap::new();
-        for (k, v) in node_map {
-            nodes.insert(k.clone(), Node::from(k.clone(), v.to_vec()));
-            node_count += 1;
-        }
+        let edge_map = edges.iter().map(|edge| {
+            match nodes.entry(edge.source) {
+                Entry::Vacant(entry) => { entry.insert(Node::from(edge.source, vec![edge.clone()])); }
+                Entry::Occupied(mut entry) => { entry.get_mut().edges.push(edge.clone()); }
+            }
+
+            match nodes.entry(edge.destination) {
+                Entry::Vacant(entry) => { entry.insert(Node::from(edge.destination, vec![])); }
+                Entry::Occupied(mut _entry) => {}
+            }
+
+            return (edge.index, edge.clone());
+        }).collect();
+
+        let node_size: usize = nodes.keys().len();
 
         Graph {
             nodes_lookup: nodes,
             edges_lookup: edge_map,
             node_position_lookup: None,
             edges,
-            node_count,
+            node_count: node_size,
         }
     }
 
     pub fn from_adjacency_matrix(matrix: &[&[f32]]) -> Graph {
-        let mut index: usize = 0;
         let mut vec: Vec<Edge> = Vec::new();
-
         for (row, array) in matrix.iter().enumerate() {
             for (col, weight) in array.iter().enumerate() {
                 if !weight.eq(&(0.0 as f32)) {
-                    vec.push(Edge::from(index, row, col, weight.clone()));
-                    index += 1;
+                    vec.push(Edge::from(row * array.len() + col, row, col, weight.clone()));
                 }
             }
         }
@@ -87,13 +87,6 @@ impl Graph {
     pub fn offer_positions(&mut self, node_positions: HashMap<usize, Position>) {
         self.node_position_lookup = Some(node_positions);
     }
-}
-
-fn add_edge_to_node_map(src: usize, dest: usize, edge: Edge, node_map: &mut HashMap<usize, Vec<Edge>>) {
-    let mut vec = node_map.get(&src).or(Some(&Vec::<Edge>::new())).unwrap().to_vec();
-    vec.push(edge);
-    node_map.insert(src.clone(), vec);
-    node_map.entry(dest).or_insert_with(|| Vec::new());
 }
 
 pub fn minimum_spanning(graph: Graph) -> Graph {

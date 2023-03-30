@@ -10,7 +10,7 @@ impl Node {
     pub fn from(id: usize, edges: Vec<Edge>) -> Node {
         return Node {
             id,
-            edges
+            edges,
         };
     }
 }
