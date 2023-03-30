@@ -1,4 +1,3 @@
-
 pub struct Grid {
     pub width: usize,
     pub height: usize,
@@ -8,13 +7,15 @@ pub struct Grid {
 
 impl Grid {
     pub fn from(grid: &[&[u32]]) -> Grid {
+        if grid.is_empty() || grid[0].is_empty() {
+            panic!("Given grid should not be empty")
+        }
+
         let (width, height) = (grid.len(), grid[0].len());
         let mut costs = vec![vec![0; height]; width];
-        let mut size = 0;
 
         for (row, row_value) in grid.iter().enumerate() {
             for (col, col_value) in row_value.iter().enumerate() {
-                size += 1;
                 costs[row][col] = col_value.clone();
             }
         }
@@ -23,7 +24,7 @@ impl Grid {
             width,
             height,
             costs,
-            size,
+            size: width * height,
         };
     }
 
@@ -52,6 +53,7 @@ impl Grid {
     }
 }
 
+
 #[test]
 fn get_cost_with_node_id_left_upper() {
     let grid = Grid::from(&[
@@ -62,6 +64,7 @@ fn get_cost_with_node_id_left_upper() {
 
 
     assert_eq!(4, grid.cost(0));
+    assert_eq!(9, grid.size);
 }
 
 #[test]
@@ -206,4 +209,17 @@ fn from_should_create_grid() {
     assert_eq!(9, grid.height);
     assert_eq!(9, grid.width);
     assert_eq!(7, grid.costs[8][7]);
+    assert_eq!(81, grid.size);
+}
+
+#[test]
+#[should_panic(expected = "Given grid should not be empty")]
+fn from_with_no_rows_should_panic() {
+    Grid::from(&[]);
+}
+
+#[test]
+#[should_panic(expected = "Given grid should not be empty")]
+fn from_with_no_columns_should_panic() {
+    Grid::from(&[&[]]);
 }
