@@ -56,7 +56,7 @@ pub fn in_grid(source: (usize, usize), target: (usize, usize),
     return path_finding.grid(source, target, grid, directions);
 }
 
-pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
+pub(crate) fn walk_back(waypoint: Waypoint) -> Vec<Edge> {
     let mut edges = HashSet::new();
     let mut path = Some(Box::new(waypoint));
 
@@ -70,7 +70,7 @@ pub(crate) fn walk_back(waypoint: Waypoint) -> HashSet<Edge> {
         }
     }
 
-    return edges;
+    return Vec::from_iter(edges);
 }
 
 
