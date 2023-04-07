@@ -252,7 +252,7 @@ pub fn your_function() {
 ```
 
 ### Bidirectional breadth-first search
-
+For graphs
 ```rust
 pub fn your_function() {
     let bi_bfs = path::in_graph(
@@ -260,6 +260,19 @@ pub fn your_function() {
         1 /* target */,
         &graph,
         Box::from(BiBreadthFirstSearch {}) /* used algorithm */
+    );
+}
+```
+
+For grids
+
+```rust
+pub fn your_function() {
+    let bi_bfs = path::in_grid(
+        4 /* source */,
+        1 /* target */,
+        &grid,
+        Box::from(BiBreadthFirstSearch {}), /* used algorithm */
     );
 }
 ```
