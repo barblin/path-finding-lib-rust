@@ -8,7 +8,9 @@ use crate::node::Node;
 #[cfg(test)]
 use crate::search::AStar;
 #[cfg(test)]
-use crate::search::breadth_first::{BiBreadthFirstSearch, BreadthFirstSearch};
+use crate::search::breadth_first::BreadthFirstSearch;
+#[cfg(test)]
+use crate::search::breadth_first_bi::BiBreadthFirstSearch;
 #[cfg(test)]
 use crate::search::depth_first::DepthFirstSearch;
 #[cfg(test)]
@@ -56,9 +58,13 @@ pub fn in_grid(source: (usize, usize), target: (usize, usize),
     return path_finding.grid(source, target, grid, directions);
 }
 
-pub(crate) fn walk_back(waypoint: Waypoint) -> Vec<Edge> {
+pub(crate) fn walk_back(waypoint: Option<Waypoint>) -> Vec<Edge> {
+    if waypoint.is_none() {
+        return Vec::new();
+    }
+
     let mut edges = HashSet::new();
-    let mut path = Some(Box::new(waypoint));
+    let mut path = Some(Box::new(waypoint.unwrap()));
 
     while path.is_some() {
         let current = path.unwrap();
@@ -131,11 +137,42 @@ fn breadth_first_search_should_be_successful() {
 }
 
 #[test]
+fn bi_breadth_first_search_in_grid_should_be_successful() {
+    let grid = test_grid();
+
+    let bi_bfs = in_grid((0, 0), (4, 4), &grid, Box::from(BiBreadthFirstSearch {}), &[
+        Direction::Up,
+        Direction::Down,
+        Direction::Left,
+        Direction::Right,
+        Direction::UpLeft,
+        Direction::UpRight,
+        Direction::DownLeft,
+        Direction::DownRight,
+    ]);
+
+    assert_eq!(4, bi_bfs.edges.len())
+}
+
+#[test]
+fn bi_breadth_first_search_should_be_successful() {
+    let grid = test_grid();
+    let bi_bfs = in_grid((0, 0), (4, 4), &grid, Box::from(BiBreadthFirstSearch {}), &[
+        Direction::Down,
+        Direction::Right,
+        Direction::Up,
+        Direction::Left
+    ]);
+
+    assert_eq!(8, bi_bfs.edges.len())
+}
+
+#[test]
 fn walk_back_with_only_one_waypoint_should_succeed() {
     let waypoint = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), 1, None);
 
     let mut sum_weight = 0.0;
-    for edge in walk_back(waypoint) {
+    for edge in walk_back(Some(waypoint)) {
         sum_weight += edge.weight;
     }
 
@@ -146,14 +183,14 @@ fn walk_back_with_only_one_waypoint_should_succeed() {
 fn walk_back_without_leg_should_succeed() {
     let waypoint = Waypoint::from(None, 1, None);
 
-    let edges = walk_back(waypoint);
+    let edges = walk_back(Some(waypoint));
     assert_eq!(0, edges.len());
 }
 
 
 #[test]
 fn walk_back_with_path_should_succeed() {
-    let edges = walk_back(stubbed_path());
+    let edges = walk_back(Some(stubbed_path()));
     let mut sum_weight = 0.0;
     for edge in &edges {
         sum_weight += edge.weight;
