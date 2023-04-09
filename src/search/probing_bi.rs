@@ -53,17 +53,17 @@ fn process_dequeue(
         visited.insert(current_id, current.clone());
 
         if current_id == target {
-            return Some(Graph::from(path::walk_back(Some(current.clone()))));
+            return Some(Graph::from(path::walk_back(Some(current))));
         }
 
         if other_visited.contains_key(&current_id) {
-            let mut from_current = path::walk_back(Some(current.clone()));
+            let mut from_current = path::walk_back(Some(current));
             let from_destination = path::walk_back(other_visited.get(&current_id).cloned());
             from_current.extend(from_destination);
             return Some(Graph::from(from_current));
         }
 
-        let result = go_directions(deque, current.clone(), grid, directions, &visited, target);
+        let result = go_directions(deque, current, grid, directions, &visited, target);
 
         if result.is_some() {
             return result;

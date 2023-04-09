@@ -9,6 +9,6 @@ pub mod breadth_first_bi;
 pub mod depth_first;
 pub mod dijkstra;
 pub mod hierarchical_a_star;
-pub(crate) mod probing;
-pub(crate) mod probing_bi;
-
+pub(crate) mod cost;
+mod probing;
+mod probing_bi;
