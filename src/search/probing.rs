@@ -1,9 +1,9 @@
 use std::collections::{HashMap, HashSet, VecDeque};
-
 use crate::graph::{Edge, Graph};
 use crate::grid::{Direction, Grid};
 use crate::path;
 use crate::path::Waypoint;
+use crate::search::cost;
 
 pub(crate) type Callback = fn(list: &mut VecDeque<Waypoint>) -> Option<Waypoint>;
 
@@ -81,7 +81,7 @@ pub(crate) fn go_directions(
         let dest_id = grid.node_id(dest_coord);
         let cost = grid.cost(dest_id);
 
-        if !visited.contains_key(&dest_id) && cost < f32::MAX {
+        if !visited.contains_key(&dest_id) && cost < cost::INFINITY {
             let edge = Some(Edge::from(dest_id, current.node_id, dest_id, cost));
             deque.push_back(Waypoint::from(edge, dest_id, Some(Box::new(current.clone()))));
         }

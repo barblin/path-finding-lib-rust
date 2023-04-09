@@ -12,6 +12,8 @@ use crate::search::breadth_first::BreadthFirstSearch;
 #[cfg(test)]
 use crate::search::breadth_first_bi::BiBreadthFirstSearch;
 #[cfg(test)]
+use crate::search::cost;
+#[cfg(test)]
 use crate::search::depth_first::DepthFirstSearch;
 #[cfg(test)]
 use crate::search::dijkstra::Dijkstra;
@@ -84,11 +86,11 @@ pub(crate) fn walk_back(waypoint: Option<Waypoint>) -> Vec<Edge> {
 #[cfg(test)]
 fn test_grid() -> Grid {
     return Grid::from(&[
-        &[0.0, 0.0, 0.0, f32::MAX, 0.0],
-        &[f32::MAX, 0.0, 0.0, f32::MAX, f32::MAX],
-        &[0.0, 0.0, 0.0, f32::MAX, 0.0],
-        &[f32::MAX, 0.0, 0.0, 0.0, 0.0],
-        &[0.0, 0.0, f32::MAX, 0.0, 0.0],
+        &[0.0, 0.0, 0.0, cost::INFINITY, 0.0],
+        &[cost::INFINITY, 0.0, 0.0, cost::INFINITY, cost::INFINITY],
+        &[0.0, 0.0, 0.0, cost::INFINITY, 0.0],
+        &[cost::INFINITY, 0.0, 0.0, 0.0, 0.0],
+        &[0.0, 0.0, cost::INFINITY, 0.0, 0.0],
     ]);
 }
 
