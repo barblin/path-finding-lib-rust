@@ -83,22 +83,18 @@ pub(crate) fn probe_graph(start: Node, target: Node, graph: &Graph) -> Graph {
     let mut target_visited: HashMap<usize, Waypoint> = HashMap::new();
 
     while !start_queue.is_empty() || !target_queue.is_empty() {
-        if !start_queue.is_empty() {
-            let result_start = process_node(start_queue, &mut start_visited,
-                                            &mut target_visited, &target, graph);
+        let result_start = process_node(start_queue, &mut start_visited,
+                                        &mut target_visited, &target, graph);
 
-            if result_start.is_some() {
-                return Graph::from(result_start.unwrap());
-            }
+        if result_start.is_some() {
+            return Graph::from(result_start.unwrap());
         }
 
-        if !target_queue.is_empty() {
-            let result_target = process_node(target_queue, &mut target_visited,
-                                             &mut start_visited, &start, graph);
+        let result_target = process_node(target_queue, &mut target_visited,
+                                         &mut start_visited, &start, graph);
 
-            if result_target.is_some() {
-                return Graph::from(result_target.unwrap());
-            }
+        if result_target.is_some() {
+            return Graph::from(result_target.unwrap());
         }
     }
 
@@ -110,13 +106,17 @@ fn process_node(queue: &mut VecDeque<Waypoint>,
                 end_visited: &mut HashMap<usize, Waypoint>,
                 end: &Node,
                 graph: &Graph) -> Option<Vec<Edge>> {
-    let current = dequeue(queue).unwrap();
+    if !queue.is_empty() {
+        let current = dequeue(queue).unwrap();
 
-    let result = process_edges(queue, &current, end.id, graph, &visited, &end_visited);
+        let result = process_edges(queue, &current, end.id, graph, &visited, &end_visited);
 
-    visited.insert(current.node_id, current.clone());
+        visited.insert(current.node_id, current.clone());
 
-    return result;
+        return result;
+    }
+
+    return None;
 }
 
 fn process_edges(
