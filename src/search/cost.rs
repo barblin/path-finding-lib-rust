@@ -1,1 +1,1 @@
-pub const INFINITY: f32 = f32::MAX;
+pub const INFINITY: f32 = 1000.0;

@@ -46,7 +46,58 @@ pub(crate) fn dijkstra(source: Node,
     };
 }
 
+fn dijkstra_grid(source: (usize, usize),
+                 target: (usize, usize),
+                 grid: &Grid,
+                 directions: &[Direction],
+                 heuristic: &dyn Fn((usize, usize), (usize, usize)) -> f32) -> Graph {
+    let mut visited: HashSet<usize> = HashSet::new();
+    let mut edges_for_node_id: HashMap<usize, Vec<Edge>> = HashMap::new();
+    let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
+
+    let src_id = grid.node_id(source);
+    let trg_id = grid.node_id(target);
+
+    queue.push(src_id, NotNan::new(0.0).unwrap());
+    edges_for_node_id.insert(src_id, Vec::new());
+
+    while !visited.contains(&trg_id) && !queue.is_empty() {
+        let node = queue.pop_min().unwrap();
+        visited.insert(node.0);
+
+        for direction in directions {
+            let dest_coord = direction.attempt_move(grid.coords(node.0));
+
+            if grid.outside(dest_coord) {
+                continue;
+            }
+
+            let dest_id = grid.node_id(dest_coord);
+
+            if !visited.contains(&dest_id) {
+                let cost = node.1 + grid.cost(dest_id) + heuristic(dest_coord, target);
+                queue.push(dest_id, cost);
+
+                let mut from_edges = edges_for_node_id.get(&node.0).unwrap().clone();
+                let edge = Edge::from(dest_id, node.0, dest_id, grid.cost(dest_id));
+                from_edges.push(edge);
+                edges_for_node_id.insert(dest_id, from_edges);
+            }
+        }
+    }
+
+    return match edges_for_node_id.get(&trg_id) {
+        None => Graph::from(Vec::new()),
+        Some(edges) => Graph::from(edges.clone())
+    };
+}
+
+
 fn dijkstra_heuristic(_source: usize, _destination: usize, _graph: &Graph) -> f32 {
+    return 0.0;
+}
+
+fn dijkstra_heuristic_grid(_source: (usize, usize), _destination: (usize, usize)) -> f32 {
     return 0.0;
 }
 
@@ -55,8 +106,8 @@ impl PathFinding for Dijkstra {
         return dijkstra(source, target, graph, &dijkstra_heuristic);
     }
 
-    fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
-        return Graph::from(Vec::new());
+    fn grid(&self, source: (usize, usize), target: (usize, usize), grid: &Grid, directions: &[Direction]) -> Graph {
+        return dijkstra_grid(source, target, grid, directions, &dijkstra_heuristic_grid);
     }
 }
 
