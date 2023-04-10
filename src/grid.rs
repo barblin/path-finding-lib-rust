@@ -44,8 +44,8 @@ impl Grid {
             panic!("Given grid should not be empty")
         }
 
-        let (width, height) = (grid.len(), grid[0].len());
-        let mut costs = vec![vec![0.0; height]; width];
+        let (height, width) = (grid.len(), grid[0].len());
+        let mut costs = vec![vec![0.0; width]; height];
 
         for (row, row_value) in grid.iter().enumerate() {
             for (col, col_value) in row_value.iter().enumerate() {
@@ -82,7 +82,7 @@ impl Grid {
             panic!("Node id exceeds grid size");
         }
 
-        return (node_id / self.height, node_id % self.width);
+        return (node_id / self.width, node_id % self.width);
     }
 
     pub fn cost(&self, node_id: usize) -> f32 {
