@@ -24,14 +24,14 @@ pub fn euclidean_distance(source: usize, destination: usize, graph: &Graph) -> f
     let src = get_position(source, graph);
     let dest = get_position(destination, graph);
 
-    return ((dest.x - src.x).powf(2.0) + (dest.y - src.y).powf(2.0) + (dest.z - src.z).powf(2.0)).sqrt();
+    return src.euclidean_dist(dest);
 }
 
 pub fn manhattan_distance(source: usize, destination: usize, graph: &Graph) -> f32 {
     let src = get_position(source, graph);
     let dest = get_position(destination, graph);
 
-    return (dest.x - src.x).abs() + (dest.y - src.y).abs() + (dest.z - src.z).abs();
+    return src.manhattan_dist(dest);
 }
 
 pub struct AStar {
