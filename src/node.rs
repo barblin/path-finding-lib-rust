@@ -37,6 +37,16 @@ impl Position3D {
             z,
         };
     }
+
+    pub fn euclidean_dist(&self, o: &Position3D) -> f32 {
+        return ((o.x - self.x).powf(2.0) +
+            (o.y - self.y).powf(2.0) +
+            (o.z - self.z).powf(2.0)).sqrt();
+    }
+
+    pub fn manhattan_dist(&self, o: &Position3D) -> f32 {
+        return (o.x - self.x).abs() + (o.y - self.y).abs() + (o.z - self.z).abs();
+    }
 }
 
 #[test]
