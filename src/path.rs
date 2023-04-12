@@ -60,13 +60,9 @@ pub fn in_grid(source: (usize, usize), target: (usize, usize),
     return path_finding.grid(source, target, grid, directions);
 }
 
-pub(crate) fn walk_back(waypoint: Option<Waypoint>) -> Vec<Edge> {
-    if waypoint.is_none() {
-        return Vec::new();
-    }
-
+pub(crate) fn walk_back(waypoint: Waypoint) -> Vec<Edge> {
     let mut edges = HashSet::new();
-    let mut path = Some(Box::new(waypoint.unwrap()));
+    let mut path = Some(Box::new(waypoint));
 
     while path.is_some() {
         let current = path.unwrap();
@@ -259,7 +255,7 @@ fn walk_back_with_only_one_waypoint_should_succeed() {
     let waypoint = Waypoint::from(Some(Edge::from(0, 0, 1, 1.0)), 1, None);
 
     let mut sum_weight = 0.0;
-    for edge in walk_back(Some(waypoint)) {
+    for edge in walk_back(waypoint) {
         sum_weight += edge.weight;
     }
 
@@ -270,14 +266,14 @@ fn walk_back_with_only_one_waypoint_should_succeed() {
 fn walk_back_without_leg_should_succeed() {
     let waypoint = Waypoint::from(None, 1, None);
 
-    let edges = walk_back(Some(waypoint));
+    let edges = walk_back(waypoint);
     assert_eq!(0, edges.len());
 }
 
 
 #[test]
 fn walk_back_with_path_should_succeed() {
-    let edges = walk_back(Some(stubbed_path()));
+    let edges = walk_back(stubbed_path());
     let mut sum_weight = 0.0;
     for edge in &edges {
         sum_weight += edge.weight;

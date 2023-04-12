@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet, VecDeque};
+
 use crate::graph::{Edge, Graph};
 use crate::grid::{Direction, Grid};
 use crate::path;
@@ -16,29 +17,35 @@ pub(crate) fn dequeue(queue: &mut VecDeque<Waypoint>) -> Option<Waypoint> {
 }
 
 pub(crate) fn probe_graph(start: usize, target: usize, graph: &Graph, control_flow: Callback) -> Graph {
-    let deque = &mut VecDeque::from([Waypoint::from(None, start, None)]);
+    let mut deque = VecDeque::from([Waypoint::from(None, start, None)]);
     let mut visited: HashSet<usize> = HashSet::new();
 
-    while !deque.is_empty() {
-        let current = control_flow(deque).unwrap();
-        let edges = graph.nodes_lookup.get(&current.node_id).unwrap().edges.clone();
-        visited.insert(current.node_id);
+    while let Some(current) = control_flow(&mut deque) {
+        if let Some(node) = graph.nodes_lookup.get(&current.node_id) {
+            let edges = node.edges.clone();
+            visited.insert(current.node_id);
 
-        for edge in edges {
-            let destination = edge.destination;
+            for edge in edges {
+                let destination = edge.destination;
 
-            if !visited.contains(&destination) {
-                deque.push_back(Waypoint::from(Some(edge.clone()), destination,
-                                               Some(Box::new(current.clone()))))
-            }
+                if !visited.contains(&destination) {
+                    deque.push_back(Waypoint::from(
+                        Some(edge.clone()),
+                        destination,
+                        Some(Box::new(current.clone())),
+                    ));
+                }
 
-            if destination == target {
-                return Graph::from(path::walk_back(deque.pop_back()));
+                if destination == target {
+                    let edges = deque.pop_back()
+                        .map_or_else(|| Vec::new(), |w| path::walk_back(w));
+                    return Graph::from(edges);
+                }
             }
         }
     }
 
-    return Graph::from(Vec::new());
+    Graph::from(Vec::new())
 }
 
 pub(crate) fn probe_grid(start_coord: (usize, usize), target_coord: (usize, usize),
@@ -46,21 +53,18 @@ pub(crate) fn probe_grid(start_coord: (usize, usize), target_coord: (usize, usiz
     let start = grid.node_id(start_coord);
     let target = grid.node_id(target_coord);
 
-    let deque = &mut VecDeque::from([Waypoint::from(None, start, None)]);
+    let mut deque = VecDeque::from([Waypoint::from(None, start, None)]);
     let mut visited: HashMap<usize, Waypoint> = HashMap::new();
 
-    while !deque.is_empty() {
-        let current = control_flow(deque).unwrap();
+    while let Some(current) = control_flow(&mut deque) {
         visited.insert(current.node_id, current.clone());
 
-        let result = go_directions(deque, current, grid, directions, &visited, target);
-
-        if result.is_some() {
-            return result.unwrap();
+        if let Some(result) = go_directions(&mut deque, current, grid, directions, &visited, target) {
+            return result;
         }
     }
 
-    return Graph::from(Vec::new());
+    Graph::from(Vec::new())
 }
 
 pub(crate) fn go_directions(
@@ -82,14 +86,16 @@ pub(crate) fn go_directions(
         let cost = grid.cost(dest_id);
 
         if !visited.contains_key(&dest_id) && cost < cost::INFINITY {
-            let edge = Some(Edge::from(dest_id, current.node_id, dest_id, cost));
-            deque.push_back(Waypoint::from(edge, dest_id, Some(Box::new(current.clone()))));
+            let edge = Edge::from(dest_id, current.node_id, dest_id, cost);
+            deque.push_back(Waypoint::from(Some(edge), dest_id, Some(Box::new(current.clone()))));
         }
 
         if dest_id == target {
-            return Some(Graph::from(path::walk_back(deque.pop_back())));
+            return deque.pop_back()
+                .map(path::walk_back)
+                .map(Graph::from);
         }
     }
 
-    return None;
+    None
 }
