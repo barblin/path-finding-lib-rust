@@ -53,14 +53,15 @@ fn process_dequeue(
         visited.insert(current_id, current.clone());
 
         if current_id == target {
-            return Some(Graph::from(path::walk_back(Some(current))));
+            return Some(Graph::from(path::walk_back(current)));
         }
 
         if other_visited.contains_key(&current_id) {
-            let mut from_current = path::walk_back(Some(current));
-            let from_destination = path::walk_back(other_visited.get(&current_id).cloned());
-            from_current.extend(from_destination);
-            return Some(Graph::from(from_current));
+            let mut from_current = path::walk_back(current);
+            let other_edges = other_visited.get(&current_id)
+                .map_or_else(|| Vec::new(), |w| path::walk_back(w.clone()));
+            from_current.extend(other_edges);
+            return Some(Graph::from(from_current.clone()));
         }
 
         let result = go_directions(deque, current, grid, directions, &visited, target);
@@ -136,7 +137,7 @@ fn process_edges(
                                       Some(Box::new(current.clone())));
 
         if destination == target {
-            return Some(path::walk_back(Some(waypoint)));
+            return Some(path::walk_back(waypoint));
         }
 
         if !visited.contains_key(&destination) {
@@ -144,9 +145,10 @@ fn process_edges(
         }
 
         if other_visited.contains_key(&destination) {
-            let mut from_current = path::walk_back(queue.pop_back());
-            let from_destination = path::walk_back(other_visited.get(&destination).cloned());
-            from_current.extend(from_destination);
+            let mut from_current = queue.pop_back().map_or_else(|| Vec::new(), |w| path::walk_back(w));
+            let other_edges = other_visited.get(&destination)
+                .map_or_else(|| Vec::new(), |w| path::walk_back(w.clone()));
+            from_current.extend(other_edges);
             return Some(from_current);
         }
     }
