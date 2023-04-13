@@ -62,19 +62,16 @@ pub fn in_grid(source: (usize, usize), target: (usize, usize),
 
 pub(crate) fn walk_back(waypoint: Waypoint) -> Vec<Edge> {
     let mut edges = HashSet::new();
-    let mut path = Some(Box::new(waypoint));
+    let mut path = Some(waypoint);
 
-    while path.is_some() {
-        let current = path.unwrap();
-        let leg = current.leg;
-        let previous = current.previous;
-        path = previous.clone();
-        if leg.is_some() {
-            edges.insert(leg.unwrap());
+    while let Some(current) = path {
+        if let Some(leg) = current.leg {
+            edges.insert(leg);
         }
+        path = current.previous.map(|previous| *previous);
     }
 
-    return Vec::from_iter(edges);
+    Vec::from_iter(edges)
 }
 
 
