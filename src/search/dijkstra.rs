@@ -17,33 +17,33 @@ pub(crate) fn dijkstra(source: Node,
                        graph: &Graph,
                        heuristic: &dyn Fn(usize, usize, &Graph) -> f32) -> Graph {
     let mut visited: HashSet<usize> = HashSet::new();
-    let mut edges_for_node_id: HashMap<usize, Vec<Edge>> = HashMap::new();
+    let mut node_to_edges: HashMap<usize, Vec<Edge>> = HashMap::new();
     let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
 
     queue.push(source.id, NotNan::new(0.0).unwrap());
-    edges_for_node_id.insert(source.id, Vec::new());
+    node_to_edges.insert(source.id, Vec::new());
 
     while !visited.contains(&target.id) && !queue.is_empty() {
-        let node = queue.pop_min().unwrap();
-        visited.insert(node.0);
+        let current = queue.pop_min().unwrap();
+        visited.insert(current.0);
 
-        let edges = graph.nodes_lookup.get(&node.0).unwrap().edges.clone();
-        for edge in edges {
-            if !visited.contains(&edge.destination) {
-                let cost = node.1 + edge.weight + heuristic(edge.destination, target.id, graph);
-                queue.push(edge.destination, cost);
+        if let Some(node) = graph.nodes_lookup.get(&current.0) {
+            for edge in &node.edges {
+                let dest_id = edge.destination;
 
-                let mut from_edges = edges_for_node_id.get(&node.0).unwrap().clone();
-                from_edges.push(edge.clone());
-                edges_for_node_id.insert(edge.destination, from_edges);
+                if !visited.contains(&dest_id) {
+                    let cost = current.1 + edge.weight + heuristic(edge.destination, target.id, graph);
+                    queue.push(edge.destination, cost);
+
+                    let mut from_edges = node_to_edges.get(&current.0).unwrap_or(&Vec::new()).clone();
+                    from_edges.push(edge.clone());
+                    node_to_edges.insert(dest_id, from_edges);
+                }
             }
         }
     }
 
-    return match edges_for_node_id.get(&target.id) {
-        None => Graph::from(Vec::new()),
-        Some(edges) => Graph::from(edges.clone())
-    };
+    return Graph::from(node_to_edges.get(&target.id).cloned().unwrap_or_default().into());
 }
 
 fn dijkstra_grid(source: (usize, usize),
@@ -52,21 +52,21 @@ fn dijkstra_grid(source: (usize, usize),
                  directions: &[Direction],
                  heuristic: &dyn Fn((usize, usize), (usize, usize)) -> f32) -> Graph {
     let mut visited: HashSet<usize> = HashSet::new();
-    let mut edges_for_node_id: HashMap<usize, Vec<Edge>> = HashMap::new();
+    let mut node_to_edges: HashMap<usize, Vec<Edge>> = HashMap::new();
     let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
 
     let src_id = grid.node_id(source);
     let trg_id = grid.node_id(target);
 
     queue.push(src_id, NotNan::new(0.0).unwrap());
-    edges_for_node_id.insert(src_id, Vec::new());
+    node_to_edges.insert(src_id, Vec::new());
 
     while !visited.contains(&trg_id) && !queue.is_empty() {
-        let node = queue.pop_min().unwrap();
-        visited.insert(node.0);
+        let current = queue.pop_min().unwrap();
+        visited.insert(current.0);
 
         for direction in directions {
-            let dest_coord = direction.attempt_move(grid.coords(node.0));
+            let dest_coord = direction.attempt_move(grid.coords(current.0));
 
             if grid.outside(dest_coord) {
                 continue;
@@ -75,21 +75,18 @@ fn dijkstra_grid(source: (usize, usize),
             let dest_id = grid.node_id(dest_coord);
 
             if !visited.contains(&dest_id) {
-                let cost = node.1 + grid.cost(dest_id) + heuristic(dest_coord, target);
+                let cost = current.1 + grid.cost(dest_id) + heuristic(dest_coord, target);
                 queue.push(dest_id, cost);
+                let edge = Edge::from(dest_id, current.0, dest_id, grid.cost(dest_id));
 
-                let mut from_edges = edges_for_node_id.get(&node.0).unwrap().clone();
-                let edge = Edge::from(dest_id, node.0, dest_id, grid.cost(dest_id));
+                let mut from_edges = node_to_edges.get(&current.0).unwrap_or(&Vec::new()).clone();
                 from_edges.push(edge);
-                edges_for_node_id.insert(dest_id, from_edges);
+                node_to_edges.insert(dest_id, from_edges);
             }
         }
     }
 
-    return match edges_for_node_id.get(&trg_id) {
-        None => Graph::from(Vec::new()),
-        Some(edges) => Graph::from(edges.clone())
-    };
+    return Graph::from(node_to_edges.get(&trg_id).cloned().unwrap_or_default().into());
 }
 
 
