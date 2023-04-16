@@ -87,3 +87,64 @@ fn unify_should_decrease_components() {
     assert_eq!(2, union_find.size(0));
     assert_eq!(0, union_find.parent(1));
 }
+
+#[test]
+fn test_find() {
+    let mut union_find = UnionFind::from(5);
+    union_find.unify(0, 1);
+    union_find.unify(1, 2);
+
+    assert_eq!(0, union_find.find(2));
+}
+
+#[test]
+fn test_connected() {
+    let mut union_find = UnionFind::from(5);
+    union_find.unify(0, 1);
+    union_find.unify(3, 4);
+
+    assert!(union_find.connected(0, 1));
+    assert!(union_find.connected(3, 4));
+    assert!(!union_find.connected(0, 4));
+}
+
+#[test]
+fn test_unify() {
+    let mut union_find = UnionFind::from(4);
+    union_find.unify(0, 1);
+
+    assert_eq!(2, union_find.size(0));
+    assert_eq!(1, union_find.size(1));
+    assert_eq!(1, union_find.size(2));
+    assert_eq!(1, union_find.size(3));
+}
+
+#[test]
+fn test_unify_multiple_groups() {
+    let mut union_find = UnionFind::from(6);
+    union_find.unify(0, 1);
+    union_find.unify(1, 2);
+    union_find.unify(3, 4);
+
+    assert_eq!(3, union_find.size(0));
+    assert_eq!(1, union_find.size(1));
+    assert_eq!(1, union_find.size(2));
+    assert_eq!(2, union_find.size(3));
+    assert_eq!(1, union_find.size(4));
+    assert_eq!(1, union_find.size(5));
+}
+
+#[test]
+fn test_components() {
+    let mut union_find = UnionFind::from(5);
+    assert_eq!(5, union_find.components);
+
+    union_find.unify(0, 1);
+    assert_eq!(4, union_find.components);
+
+    union_find.unify(1, 2);
+    assert_eq!(3, union_find.components);
+
+    union_find.unify(3, 4);
+    assert_eq!(2, union_find.components);
+}

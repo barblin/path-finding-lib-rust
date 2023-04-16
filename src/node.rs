@@ -74,3 +74,21 @@ fn create_position_should_succeed() {
     assert_eq!(0.2, position.y);
     assert_eq!(0.3, position.z);
 }
+
+#[test]
+fn test_euclidean_distance() {
+    let position1 = Position3D::from(0.0, 0.0, 0.0);
+    let position2 = Position3D::from(1.0, 1.0, 1.0);
+
+    let dist = position1.euclidean_dist(&position2);
+    assert_eq!(1.7320508, dist);
+}
+
+#[test]
+fn test_manhattan_distance() {
+    let position1 = Position3D::from(0.0, 0.0, 0.0);
+    let position2 = Position3D::from(1.0, 1.0, 1.0);
+
+    let dist = position1.manhattan_dist(&position2);
+    assert_eq!(3.0, dist);
+}
