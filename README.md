@@ -55,17 +55,13 @@ At the moment, we have following major concepts:
 - Position
 - Grid
 
-You only need to pass edges to the graph. The nodes are generated automatically. Each pathfinding method will accept a
-graph,
-and return a graph that only contains the edges and nodes of the result.
+You only need to pass edges to the graph. The nodes are generated automatically. Each pathfinding method will accept a graph and return a graph that only contains the edges and nodes of the result.
 
-Alternatively, you can also create a graph if you provide an adjacency matrix. Edges and nodes will be generated
-automatically.
+Alternatively, you can also create a graph if you provide an adjacency matrix. Edges and nodes will be generated automatically.
 
-If you want to use the A* path-finding algorithm, please make sure to provide positional information for each node.
+If you want to use the A* pathfinding algorithm, please make sure to provide positional information for each node.
 
-Additionally, we work on a support for each of those algorithms based on a 2D grid based structure.
-
+Additionally, we are working on support for each of those algorithms based on a 2D grid-based structure.
 ### Create Graph
 
 - Create Edge
@@ -308,6 +304,8 @@ You can use the A* path-finding algorithm by providing either an existing heuris
 provide your own heuristic function. In case you use an existing heuristic function, make sure to provide the positional
 information for the nodes.
 
+For graphs
+
 ```rust
 pub fn your_function_with_euclidean_distance() {
     let a_star = path::in_graph(
@@ -325,6 +323,29 @@ pub fn your_function_with_manhattan_distance() {
         4 /* source */,
         1 /* target */,
         &graph,
+        Box::from(AStar { heuristic: Box::from(manhattan_distance) }), /* used algorithm + manhattan distance heuristic function */
+    );
+}
+```
+
+For grids
+```rust
+pub fn your_function_with_euclidean_distance() {
+    let a_star = path::in_grid(
+        4 /* source */,
+        1 /* target */,
+        &grid,
+        Box::from(AStar { heuristic: Box::from(euclidean_distance) }), /* used algorithm + euclidean distance heuristic function */
+    );
+}
+```
+
+```rust
+pub fn your_function_with_manhattan_distance() {
+    let a_star = path::in_grid(
+        4 /* source */,
+        1 /* target */,
+        &grid,
         Box::from(AStar { heuristic: Box::from(manhattan_distance) }), /* used algorithm + manhattan distance heuristic function */
     );
 }

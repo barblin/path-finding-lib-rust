@@ -44,7 +44,7 @@ impl PathFinding for AStar {
     }
 
     fn grid(&self, _source: (usize, usize), _target: (usize, usize), _grid: &Grid, _directions: &[Direction]) -> Graph {
-        return Graph::from(Vec::new());
+        return dijkstra(source, target, graph, &self.heuristic);
     }
 }
 
