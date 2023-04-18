@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use crate::{graph::{Edge, Graph}};
 use crate::grid::{Direction, Grid};
-use crate::node::Node;
+use crate::node::{Node, Position};
 #[cfg(test)]
 use crate::search::AStar;
 #[cfg(test)]
@@ -443,7 +443,7 @@ fn a_star_edges() -> Vec<Edge> {
 }
 
 #[cfg(test)]
-fn inconsistent(source: usize, destination: usize, _graph: &Graph) -> f32 {
+fn inconsistent(source: &Position, destination: &Position) -> f32 {
     return HashMap::from([
         ((0, 4), 2.0),
         ((1, 4), 4.0),

@@ -5,7 +5,7 @@ use priority_queue::DoublePriorityQueue;
 
 use crate::graph::{Edge, Graph};
 use crate::grid::{Direction, Grid};
-use crate::node::Node;
+use crate::node::{Node, Position};
 use crate::path::PathFinding;
 
 pub struct BreadthFirstSearch {}
@@ -15,7 +15,7 @@ pub struct Dijkstra {}
 pub(crate) fn dijkstra(source: Node,
                        target: Node,
                        graph: &Graph,
-                       heuristic: &dyn Fn(usize, usize, &Graph) -> f32) -> Graph {
+                       heuristic: &dyn Fn(&Position, &Position) -> f32) -> Graph {
     let mut visited: HashSet<usize> = HashSet::new();
     let mut node_to_edges: HashMap<usize, Vec<Edge>> = HashMap::new();
     let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
@@ -32,7 +32,10 @@ pub(crate) fn dijkstra(source: Node,
                 let dest_id = edge.destination;
 
                 if !visited.contains(&dest_id) {
-                    let cost = current.1 + edge.weight + heuristic(edge.destination, target.id, graph);
+                    let cost = current.1 + edge.weight + heuristic(
+                        graph.get_position(&edge.destination),
+                        graph.get_position(&target.id),
+                    );
                     queue.push(edge.destination, cost);
 
                     let mut from_edges = node_to_edges.get(&current.0).unwrap_or(&Vec::new()).clone();
@@ -46,11 +49,11 @@ pub(crate) fn dijkstra(source: Node,
     return Graph::from(node_to_edges.get(&target.id).cloned().unwrap_or_default().into());
 }
 
-fn dijkstra_grid(source: (usize, usize),
-                 target: (usize, usize),
-                 grid: &Grid,
-                 directions: &[Direction],
-                 heuristic: &dyn Fn((usize, usize), (usize, usize)) -> f32) -> Graph {
+pub(crate) fn dijkstra_grid(source: (usize, usize),
+                            target: (usize, usize),
+                            grid: &Grid,
+                            directions: &[Direction],
+                            heuristic: &dyn Fn(&Position, &Position) -> f32) -> Graph {
     let mut visited: HashSet<usize> = HashSet::new();
     let mut node_to_edges: HashMap<usize, Vec<Edge>> = HashMap::new();
     let mut queue: DoublePriorityQueue<usize, NotNan<f32>> = DoublePriorityQueue::new();
@@ -75,7 +78,10 @@ fn dijkstra_grid(source: (usize, usize),
             let dest_id = grid.node_id(dest_coord);
 
             if !visited.contains(&dest_id) {
-                let cost = current.1 + grid.cost(dest_id) + heuristic(dest_coord, target);
+                let cost = current.1 + grid.cost(dest_id) + heuristic(
+                    &Position::from(dest_coord.0 as f32, dest_coord.1 as f32, 0.0),
+                    &Position::from(target.0 as f32, target.1 as f32, 0.0),
+                );
                 queue.push(dest_id, cost);
                 let edge = Edge::from(dest_id, current.0, dest_id, grid.cost(dest_id));
 
@@ -89,12 +95,7 @@ fn dijkstra_grid(source: (usize, usize),
     return Graph::from(node_to_edges.get(&trg_id).cloned().unwrap_or_default().into());
 }
 
-
-fn dijkstra_heuristic(_source: usize, _destination: usize, _graph: &Graph) -> f32 {
-    return 0.0;
-}
-
-fn dijkstra_heuristic_grid(_source: (usize, usize), _destination: (usize, usize)) -> f32 {
+fn dijkstra_heuristic(_src: &Position, _dest: &Position) -> f32 {
     return 0.0;
 }
 
@@ -104,7 +105,7 @@ impl PathFinding for Dijkstra {
     }
 
     fn grid(&self, source: (usize, usize), target: (usize, usize), grid: &Grid, directions: &[Direction]) -> Graph {
-        return dijkstra_grid(source, target, grid, directions, &dijkstra_heuristic_grid);
+        return dijkstra_grid(source, target, grid, directions, &dijkstra_heuristic);
     }
 }
 

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use derivative::Derivative;
 
-use crate::node::{Node, Position3D};
+use crate::node::{Node, Position};
 use crate::union_find::UnionFind;
 
 #[derive(Derivative)]
@@ -31,7 +31,7 @@ impl Edge {
 pub struct Graph {
     pub edges_lookup: HashMap<usize, Edge>,
     pub nodes_lookup: HashMap<usize, Node>,
-    pub node_position_lookup: Option<HashMap<usize, Position3D>>,
+    pub node_position_lookup: Option<HashMap<usize, Position>>,
     pub edges: Vec<Edge>,
     pub node_count: usize,
 }
@@ -84,8 +84,20 @@ impl Graph {
         return sorted_edges;
     }
 
-    pub fn offer_positions(&mut self, node_positions: HashMap<usize, Position3D>) {
+    pub fn offer_positions(&mut self, node_positions: HashMap<usize, Position>) {
         self.node_position_lookup = Some(node_positions);
+    }
+
+    pub fn get_position(&self, node_id: &usize) -> &Position {
+        match &self.node_position_lookup {
+            None => panic!("You must offer node positions to the graph before using this heuristic."),
+            Some(positions) => {
+                return match positions.get(node_id) {
+                    None => panic!("Node position missing for given node id: {node_id}"),
+                    Some(position) => position
+                };
+            }
+        };
     }
 }
 
@@ -210,9 +222,9 @@ fn offer_node_positions_should_set_node_positions() {
     let edge = Edge::from(0, 2, 3, 0.5);
     let mut graph = Graph::from(Vec::from([edge.clone()]));
 
-    let mut node_positions: HashMap<usize, Position3D> = HashMap::new();
-    node_positions.insert((&edge).source.clone(), Position3D::from(0.3, 0.2, 0.0));
-    node_positions.insert((&edge).destination.clone(), Position3D::from(0.1, 0.5, 0.0));
+    let mut node_positions: HashMap<usize, Position> = HashMap::new();
+    node_positions.insert((&edge).source.clone(), Position::from(0.3, 0.2, 0.0));
+    node_positions.insert((&edge).destination.clone(), Position::from(0.1, 0.5, 0.0));
 
     graph.offer_positions(node_positions);
 
