@@ -4,7 +4,9 @@ use std::collections::HashSet;
 
 use crate::{graph::{Edge, Graph}};
 use crate::grid::{Direction, Grid};
-use crate::node::{Node, Position};
+use crate::node::Node;
+#[cfg(test)]
+use crate::node::Vec3;
 #[cfg(test)]
 use crate::search::AStar;
 #[cfg(test)]
@@ -432,30 +434,40 @@ fn should_find_path_with_source_and_target_reversed() {
 }
 
 #[cfg(test)]
-fn a_star_edges() -> Vec<Edge> {
-    return Vec::from([
+fn inconsistent(source: &Vec3, destination: &Vec3) -> f32 {
+    return HashMap::from([
+        ((&Vec3::from(0.0, 0.0, 0.0), &Vec3::from(0.0, 0.0, 0.4)), 2.0),
+        ((&Vec3::from(0.0, 0.0, 0.1), &Vec3::from(0.0, 0.0, 0.4)), 4.0),
+        ((&Vec3::from(0.0, 0.0, 0.2), &Vec3::from(0.0, 0.0, 0.4)), 1.0),
+        ((&Vec3::from(0.0, 0.0, 0.3), &Vec3::from(0.0, 0.0, 0.4)), 1.0),
+        ((&Vec3::from(0.0, 0.0, 0.4), &Vec3::from(0.0, 0.0, 0.4)), 0.0)
+    ]).get(&(source, destination)).unwrap().clone();
+}
+
+#[cfg(test)]
+fn a_star_graph() -> Graph {
+    let mut graph = Graph::from(Vec::from([
         Edge::from(0, 0, 1, 1.0),
         Edge::from(1, 0, 2, 1.0),
         Edge::from(2, 1, 3, 1.0),
         Edge::from(3, 2, 3, 2.0),
         Edge::from(4, 3, 4, 3.0),
-    ]);
-}
+    ]));
 
-#[cfg(test)]
-fn inconsistent(source: &Position, destination: &Position) -> f32 {
-    return HashMap::from([
-        ((0, 4), 2.0),
-        ((1, 4), 4.0),
-        ((2, 4), 1.0),
-        ((3, 4), 1.0),
-        ((4, 4), 0.0)
-    ]).get(&(source, destination)).unwrap().clone();
+    graph.offer_positions(HashMap::from([
+        (0, Vec3::from(0.0, 0.0, 0.0)),
+        (1, Vec3::from(0.0, 0.0, 0.1)),
+        (2, Vec3::from(0.0, 0.0, 0.2)),
+        (3, Vec3::from(0.0, 0.0, 0.3)),
+        (4, Vec3::from(0.0, 0.0, 0.4)),
+    ]));
+
+    return graph;
 }
 
 #[test]
 fn should_find_path_with_a_star_and_inconsistent_heuristic() {
-    let a_star = in_graph(0, 4, &Graph::from(a_star_edges()),
+    let a_star = in_graph(0, 4, &a_star_graph(),
                           Box::from(AStar { heuristic: Box::from(inconsistent) }));
 
     let mut total_cost: f32 = 0.0;
@@ -468,21 +480,20 @@ fn should_find_path_with_a_star_and_inconsistent_heuristic() {
 }
 
 #[cfg(test)]
-fn consistent(source: usize, destination: usize, _graph: &Graph) -> f32 {
+fn consistent(source: &Vec3, destination: &Vec3) -> f32 {
     return HashMap::from([
-        ((0, 4), 2.0),
-        ((1, 4), 1.0),
-        ((2, 4), 1.0),
-        ((3, 4), 1.0),
-        ((4, 4), 0.0)
+        ((&Vec3::from(0.0, 0.0, 0.0), &Vec3::from(0.0, 0.0, 0.4)), 2.0),
+        ((&Vec3::from(0.0, 0.0, 0.1), &Vec3::from(0.0, 0.0, 0.4)), 1.0),
+        ((&Vec3::from(0.0, 0.0, 0.2), &Vec3::from(0.0, 0.0, 0.4)), 1.0),
+        ((&Vec3::from(0.0, 0.0, 0.3), &Vec3::from(0.0, 0.0, 0.4)), 1.0),
+        ((&Vec3::from(0.0, 0.0, 0.4), &Vec3::from(0.0, 0.0, 0.4)), 0.0)
     ]).get(&(source, destination)).unwrap().clone();
 }
 
 #[test]
 fn should_find_path_with_a_star_and_consistent_heuristic() {
     let algo = AStar { heuristic: Box::from(consistent) };
-    let a_star = in_graph(0, 4, &Graph::from(a_star_edges()),
-                          Box::from(algo));
+    let a_star = in_graph(0, 4, &a_star_graph(), Box::from(algo));
 
     let mut total_cost: f32 = 0.0;
     for edge in &a_star.edges {

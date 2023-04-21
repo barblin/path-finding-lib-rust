@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use derivative::Derivative;
 
-use crate::node::{Node, Position};
+use crate::node::{Node, Vec3};
 use crate::union_find::UnionFind;
 
 #[derive(Derivative)]
@@ -31,7 +31,7 @@ impl Edge {
 pub struct Graph {
     pub edges_lookup: HashMap<usize, Edge>,
     pub nodes_lookup: HashMap<usize, Node>,
-    pub node_position_lookup: Option<HashMap<usize, Position>>,
+    pub node_position_lookup: Option<HashMap<usize, Vec3>>,
     pub edges: Vec<Edge>,
     pub node_count: usize,
 }
@@ -84,11 +84,23 @@ impl Graph {
         return sorted_edges;
     }
 
-    pub fn offer_positions(&mut self, node_positions: HashMap<usize, Position>) {
+    pub fn offer_positions(&mut self, node_positions: HashMap<usize, Vec3>) {
         self.node_position_lookup = Some(node_positions);
     }
 
-    pub fn get_position(&self, node_id: &usize) -> &Position {
+    pub fn verify_positions(&self) {
+        return match &self.node_position_lookup {
+            None => panic!("You must offer node positions to the graph before using this\
+             heuristic. Make sure to provide a Vec3 for every node id."),
+            _ => {}
+        };
+    }
+
+    pub fn position_is_set(&self) -> bool {
+        return self.node_position_lookup.is_some();
+    }
+
+    pub fn get_position(&self, node_id: &usize) -> &Vec3 {
         match &self.node_position_lookup {
             None => panic!("You must offer node positions to the graph before using this heuristic."),
             Some(positions) => {
@@ -222,9 +234,9 @@ fn offer_node_positions_should_set_node_positions() {
     let edge = Edge::from(0, 2, 3, 0.5);
     let mut graph = Graph::from(Vec::from([edge.clone()]));
 
-    let mut node_positions: HashMap<usize, Position> = HashMap::new();
-    node_positions.insert((&edge).source.clone(), Position::from(0.3, 0.2, 0.0));
-    node_positions.insert((&edge).destination.clone(), Position::from(0.1, 0.5, 0.0));
+    let mut node_positions: HashMap<usize, Vec3> = HashMap::new();
+    node_positions.insert((&edge).source.clone(), Vec3::from(0.3, 0.2, 0.0));
+    node_positions.insert((&edge).destination.clone(), Vec3::from(0.1, 0.5, 0.0));
 
     graph.offer_positions(node_positions);
 
