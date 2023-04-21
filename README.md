@@ -52,7 +52,7 @@ At the moment, we have following major concepts:
 - Edge
 - Node
 - Graph
-- Position
+- Vec3
 - Grid
 
 You only need to pass edges to the graph. The nodes are generated automatically. Each pathfinding method will accept a
@@ -128,7 +128,7 @@ pub fn your_function() {
 ```rust
 pub fn your_function() {
     // provide a hashmap, mapping the node id to a position - used for a* pathfinding heuristics
-    graph.offer_positions(HashMap::from([(1, Position::from(0.1, 0.2, 0.3))]));
+    graph.offer_positions(HashMap::from([(1, Vec3::from(0.1, 0.2, 0.3))]));
 }
 ```
 
@@ -308,6 +308,7 @@ You can use the A* path-finding algorithm by providing either an existing heuris
 provide your own heuristic function. In case you use an existing heuristic function, make sure to provide the positional
 information for the nodes.
 
+For graphs
 ```rust
 pub fn your_function_with_euclidean_distance() {
     let a_star = path::in_graph(
@@ -325,6 +326,29 @@ pub fn your_function_with_manhattan_distance() {
         4 /* source */,
         1 /* target */,
         &graph,
+        Box::from(AStar { heuristic: Box::from(manhattan_distance) }), /* used algorithm + manhattan distance heuristic function */
+    );
+}
+```
+
+For grids
+```rust
+pub fn your_function_with_euclidean_distance() {
+    let a_star = path::in_grid(
+        4 /* source */,
+        1 /* target */,
+        &grid,
+        Box::from(AStar { heuristic: Box::from(euclidean_distance) }), /* used algorithm + euclidean distance heuristic function */
+    );
+}
+```
+
+```rust
+pub fn your_function_with_manhattan_distance() {
+    let a_star = path::in_grid(
+        4 /* source */,
+        1 /* target */,
+        &grid,
         Box::from(AStar { heuristic: Box::from(manhattan_distance) }), /* used algorithm + manhattan distance heuristic function */
     );
 }
